@@ -3,60 +3,94 @@ import pygame
 import math
 
 from pygame.locals import *
-from movingSquare import MovingSquare
+from rotTriangle import RotTriangle
 from square import Square
 
-# creare modulo costanti colori
+# TODO creare modulo costanti colori
+
+# TODO http://enesbot.me/kinematic-model-of-a-differential-drive-robot.html
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
+
 BLACK = 0, 0, 0
 GREEN = 0, 255, 0
 YELLOW = 255, 255, 0
 
-robot_size = None
-robot_speed = None
-bat_size = None
+ROBOT_SIZE = 50
+ROBOT_INITIAL_SPEED = 10
+ROBOT_INITIAL_DIRECTION = 0
+ROBOT_DIRECTION_DELTA = math.pi / 16
+ROBOT_SPEED_DELTA = 1
 
-def resetScene():
+SCREEN_MARGIN = ROBOT_SIZE / 2
+
+robot = None
+light = None
+
+
+def reset_scene():
     global robot
-    global robot_size
-    global robot_speed
-    global robot_direction
     global light
 
-    robot_size = 20
-    robot_speed = 10
-    robot_direction = -math.pi / 4
-
-    robot = MovingSquare(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, robot_size, GREEN, robot_direction, robot_speed)
+    robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, GREEN, BLACK, ROBOT_INITIAL_DIRECTION,
+                        ROBOT_INITIAL_SPEED)
 
     light = Square(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 10, YELLOW)
+
+
+def turn_left():
+    if robot.speed >= 0:
+        robot.direction -= ROBOT_DIRECTION_DELTA
+    else:
+        robot.direction += ROBOT_DIRECTION_DELTA
+
+
+def turn_right():
+    if robot.speed >= 0:
+        robot.direction += ROBOT_DIRECTION_DELTA
+    else:
+        robot.direction -= ROBOT_DIRECTION_DELTA
+
 
 if __name__ == '__main__':
     pygame.init()
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
-    resetScene()
+    reset_scene()
 
     while True:
         keys_pressed = pygame.key.get_pressed()
 
-        if keys_pressed[K_DOWN]:
-            robot.direction -= math.pi / 32
+        if keys_pressed[K_LEFT]:
+            turn_left()
+        elif keys_pressed[K_RIGHT]:
+            turn_right()
         elif keys_pressed[K_UP]:
-            robot.direction += math.pi / 32
+            robot.speed += ROBOT_SPEED_DELTA
+        elif keys_pressed[K_DOWN]:
+            robot.speed -= ROBOT_SPEED_DELTA
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
 
-        robot = robot.move()
+        robot.move()
+
+        # teletrasporto ai margini
+        if robot.x < -SCREEN_MARGIN:
+            robot.x = SCREEN_WIDTH + SCREEN_MARGIN
+        if robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
+            robot.x = -SCREEN_MARGIN
+        if robot.y < -SCREEN_MARGIN:
+            robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
+        if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
+            robot.y = -SCREEN_MARGIN
 
         screen.fill(BLACK)
         robot.draw(screen)
         light.draw(screen)
 
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(20)
 
