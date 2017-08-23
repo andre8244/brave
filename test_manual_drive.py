@@ -6,8 +6,6 @@ from pygame.locals import *
 from rotTriangle import RotTriangle
 from color import Color
 
-# TODO http://enesbot.me/kinematic-model-of-a-differential-drive-robot.html
-
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 
 ROBOT_SIZE = 50
@@ -18,29 +16,28 @@ ROBOT_SPEED_DELTA = 1
 
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
-robot = None
+dd_robot = None
 
 
 def reset_scene():
-    global robot
-    global light
+    global dd_robot
 
     robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, Color.GREEN, Color.BLACK, ROBOT_INITIAL_DIRECTION,
                         ROBOT_INITIAL_SPEED)
 
 
 def turn_left():
-    if robot.speed >= 0:
-        robot.direction -= ROBOT_DIRECTION_DELTA
+    if dd_robot.speed >= 0:
+        dd_robot.direction -= ROBOT_DIRECTION_DELTA
     else:
-        robot.direction += ROBOT_DIRECTION_DELTA
+        dd_robot.direction += ROBOT_DIRECTION_DELTA
 
 
 def turn_right():
-    if robot.speed >= 0:
-        robot.direction += ROBOT_DIRECTION_DELTA
+    if dd_robot.speed >= 0:
+        dd_robot.direction += ROBOT_DIRECTION_DELTA
     else:
-        robot.direction -= ROBOT_DIRECTION_DELTA
+        dd_robot.direction -= ROBOT_DIRECTION_DELTA
 
 
 if __name__ == '__main__':
@@ -58,28 +55,28 @@ if __name__ == '__main__':
         elif keys_pressed[K_RIGHT]:
             turn_right()
         elif keys_pressed[K_UP]:
-            robot.speed += ROBOT_SPEED_DELTA
+            dd_robot.speed += ROBOT_SPEED_DELTA
         elif keys_pressed[K_DOWN]:
-            robot.speed -= ROBOT_SPEED_DELTA
+            dd_robot.speed -= ROBOT_SPEED_DELTA
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
 
-        robot.move()
+        dd_robot.move()
 
         # teletrasporto ai margini
-        if robot.x < -SCREEN_MARGIN:
-            robot.x = SCREEN_WIDTH + SCREEN_MARGIN
-        if robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
-            robot.x = -SCREEN_MARGIN
-        if robot.y < -SCREEN_MARGIN:
-            robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
-        if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
-            robot.y = -SCREEN_MARGIN
+        if dd_robot.x < -SCREEN_MARGIN:
+            dd_robot.x = SCREEN_WIDTH + SCREEN_MARGIN
+        if dd_robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
+            dd_robot.x = -SCREEN_MARGIN
+        if dd_robot.y < -SCREEN_MARGIN:
+            dd_robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
+        if dd_robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
+            dd_robot.y = -SCREEN_MARGIN
 
         screen.fill(Color.BLACK)
-        robot.draw(screen)
+        dd_robot.draw(screen)
 
         pygame.display.flip()
         clock.tick(20)
