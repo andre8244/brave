@@ -4,17 +4,11 @@ import math
 
 from pygame.locals import *
 from rotTriangle import RotTriangle
-from square import Square
-
-# TODO creare modulo costanti colori
+from color import Color
 
 # TODO http://enesbot.me/kinematic-model-of-a-differential-drive-robot.html
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
-
-BLACK = 0, 0, 0
-GREEN = 0, 255, 0
-YELLOW = 255, 255, 0
 
 ROBOT_SIZE = 50
 ROBOT_INITIAL_SPEED = 10
@@ -25,17 +19,14 @@ ROBOT_SPEED_DELTA = 1
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
 robot = None
-light = None
 
 
 def reset_scene():
     global robot
     global light
 
-    robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, GREEN, BLACK, ROBOT_INITIAL_DIRECTION,
+    robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, Color.GREEN, Color.BLACK, ROBOT_INITIAL_DIRECTION,
                         ROBOT_INITIAL_SPEED)
-
-    light = Square(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 10, YELLOW)
 
 
 def turn_left():
@@ -87,9 +78,8 @@ if __name__ == '__main__':
         if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
             robot.y = -SCREEN_MARGIN
 
-        screen.fill(BLACK)
+        screen.fill(Color.BLACK)
         robot.draw(screen)
-        light.draw(screen)
 
         pygame.display.flip()
         clock.tick(20)
