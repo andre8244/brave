@@ -1,12 +1,12 @@
-from math import sin, cos
-from rotTriangle import RotTriangle
+from math import sin, cos, pi
+from rot_triangle import RotTriangle
 from color import Color
 
 
 class DifferentialDriveRobot(RotTriangle):
 
     def __init__(self, x, y, length, wheel_radius):
-        super().__init__(x, y, length, Color.YELLOW, Color.BLACK, 0, 0)
+        super().__init__(x, y, length, Color.YELLOW, Color.BLACK, 0)
         self.length = length
         self.wheel_radius = wheel_radius
         self.speed_left_wheel = 0.0     # angular velocity of left wheel
@@ -30,10 +30,15 @@ class DifferentialDriveRobot(RotTriangle):
         print ("direction = " + str(self.direction))
 
     def delta_x(self):
-        self.x += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * cos(self.direction)
+        self.x += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * cos(-self.direction)
 
     def delta_y(self):
-        self.y += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * sin(self.direction)
+        self.y += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * sin(-self.direction)
 
     def delta_direction(self):
-        self.direction += self._delta * (self.wheel_radius/self.length) * (self.speed_left_wheel - self.speed_right_wheel)
+        self.direction += self._delta * (self.wheel_radius/self.length) * (self.speed_right_wheel - self.speed_left_wheel)
+
+        if self.direction > pi:
+            self.direction -= 2 * pi
+        elif self.direction < -pi:
+            self.direction += 2 * pi
