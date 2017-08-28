@@ -10,6 +10,7 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         self.right_motor_controller.sense_and_act()
         self.speed_left_wheel = self.left_motor_controller.get_actuator_value()
         self.speed_right_wheel = self.right_motor_controller.get_actuator_value()
+        self.step()
 
     def set_left_motor_controller(self, left_motor_controller):
         self.left_motor_controller = left_motor_controller

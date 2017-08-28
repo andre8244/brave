@@ -11,11 +11,13 @@ class LightSensor(Sensor):
 
         for obj in self.scene.objects:
             if issubclass(type(obj), Light):
+                light = obj
+
                 # cambio SDR
                 x_robot = self.robot.x
                 y_robot = -self.robot.y
-                x_light = obj.x
-                y_light = -obj.y
+                x_light = light.x
+                y_light = -light.y
 
                 x_light -= x_robot
                 y_light -= y_robot
@@ -26,10 +28,10 @@ class LightSensor(Sensor):
 
                 angle_sensor_light = atan2(sin(difference_dir), cos(difference_dir))
 
-                # TODO EMITTING POWER AND DISTANCE
+                # TODO CONSIDER ROBOT-LIGHT DISTANCE?
 
-                value = cos(angle_sensor_light)
-                print('light:', obj, 'value:', value)
+                value = cos(angle_sensor_light) * light.emitting_power
+                # print('light:', light, 'value:', value)
 
                 if value > 0:
                     total_value += value
