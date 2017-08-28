@@ -13,17 +13,17 @@ ROBOT_WHEEL_SPEED_DELTA = 3
 
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
-dd_robot = None
+robot = None
 
 
 def reset_scene():
-    global dd_robot
+    global robot
 
     dd_robot = DifferentialDriveRobot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
 
 
 def print_wheels_speed():
-    print('speed_left_wheel:', dd_robot.speed_left_wheel, 'speed_right_wheel:', dd_robot.speed_right_wheel)
+    print('speed_left_wheel:', robot.speed_left_wheel, 'speed_right_wheel:', robot.speed_right_wheel)
 
 
 if __name__ == '__main__':
@@ -37,24 +37,24 @@ if __name__ == '__main__':
         keys_pressed = pygame.key.get_pressed()
 
         if keys_pressed[K_q]:
-            dd_robot.speed_left_wheel += ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_left_wheel += ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
         elif keys_pressed[K_a]:
-            dd_robot.speed_left_wheel -= ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_left_wheel -= ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
         elif keys_pressed[K_w]:
-            dd_robot.speed_right_wheel += ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_right_wheel += ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
         elif keys_pressed[K_s]:
-            dd_robot.speed_right_wheel -= ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_right_wheel -= ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
         elif keys_pressed[K_UP]:
-            dd_robot.speed_left_wheel += ROBOT_WHEEL_SPEED_DELTA
-            dd_robot.speed_right_wheel += ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_left_wheel += ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_right_wheel += ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
         elif keys_pressed[K_DOWN]:
-            dd_robot.speed_left_wheel -= ROBOT_WHEEL_SPEED_DELTA
-            dd_robot.speed_right_wheel -= ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_left_wheel -= ROBOT_WHEEL_SPEED_DELTA
+            robot.speed_right_wheel -= ROBOT_WHEEL_SPEED_DELTA
             print_wheels_speed()
 
         for event in pygame.event.get():
@@ -63,20 +63,20 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and event.key == K_r:
                 reset_scene()
 
-        dd_robot.step()
+        robot.step()
 
         # teletrasporto ai margini
-        if dd_robot.x < -SCREEN_MARGIN:
-            dd_robot.x = SCREEN_WIDTH + SCREEN_MARGIN
-        if dd_robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
-            dd_robot.x = -SCREEN_MARGIN
-        if dd_robot.y < -SCREEN_MARGIN:
-            dd_robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
-        if dd_robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
-            dd_robot.y = -SCREEN_MARGIN
+        if robot.x < -SCREEN_MARGIN:
+            robot.x = SCREEN_WIDTH + SCREEN_MARGIN
+        if robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
+            robot.x = -SCREEN_MARGIN
+        if robot.y < -SCREEN_MARGIN:
+            robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
+        if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
+            robot.y = -SCREEN_MARGIN
 
         screen.fill(Color.BLACK)
-        dd_robot.draw(screen)
+        robot.draw(screen)
 
         pygame.display.flip()
         clock.tick(25)
