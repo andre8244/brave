@@ -1,6 +1,7 @@
 import pygame
 from rot_surface import RotSurface
 
+
 class Light(RotSurface):
 
     def __init__(self, x, y, size, color_fg, color_bg, emitting_power):

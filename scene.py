@@ -4,4 +4,10 @@ class Scene:
         self.objects = []
 
     def put(self, obj):
-        self.objects.append(obj)
+        if isinstance(obj, list):
+            self.objects.extend(obj)
+        else:
+            self.objects.append(obj)
+
+    def remove(self, obj):
+        self.objects.remove(obj)

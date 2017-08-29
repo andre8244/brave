@@ -1,6 +1,7 @@
 import sys
 import pygame
 import math
+import random
 
 from pygame.locals import *
 from sensor_driven_robot import SensorDrivenRobot
@@ -12,13 +13,14 @@ from actuator import Actuator
 from motor_controller import MotorController
 
 
+# TODO AGGIUNGERE E RIMUOVERE LUCI CASUALMENTE
+# TODO CONTROLLO VELOCITA' SIMULAZIONE
+
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 
 ROBOT_SIZE = 30
-ROBOT_WHEEL_RADIUS = 10
 ROBOT_WHEEL_SPEED_DELTA = 3
 
-LIGHT_SENSOR_DIRECTION = math.pi / 4
 LIGHT_SENSOR_SATURATION_VALUE = 100
 
 MOTOR_CONTROLLER_COEFFICIENT = 1.5
@@ -27,16 +29,17 @@ MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
 scene = None
-robots = []
+robots = None
 
 
-def build_robot_1():
+def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
     global scene
+    global robots
 
-    robot = SensorDrivenRobot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
+    robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    left_light_sensor = LightSensor(robot, LIGHT_SENSOR_DIRECTION, LIGHT_SENSOR_SATURATION_VALUE, scene)
-    right_light_sensor = LightSensor(robot, -LIGHT_SENSOR_DIRECTION, LIGHT_SENSOR_SATURATION_VALUE, scene)
+    left_light_sensor = LightSensor(robot, light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, scene)
+    right_light_sensor = LightSensor(robot, -light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, scene)
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
     left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
@@ -51,43 +54,34 @@ def build_robot_1():
     return robot
 
 
-def build_robot_2():
+def add_robot():
     global scene
+    x = random.randint(0, SCREEN_WIDTH)
+    y = random.randint(0, SCREEN_HEIGHT)
+    robot = build_robot(x, y, 10, math.pi / 4)
+    scene.put(robot)
 
-    robot = SensorDrivenRobot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
-    robot.direction = math.pi
 
-    left_light_sensor = LightSensor(robot, LIGHT_SENSOR_DIRECTION, LIGHT_SENSOR_SATURATION_VALUE, scene)
-    right_light_sensor = LightSensor(robot, -LIGHT_SENSOR_DIRECTION, LIGHT_SENSOR_SATURATION_VALUE, scene)
-    left_wheel_actuator = Actuator()
-    right_wheel_actuator = Actuator()
-    left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                            MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-    right_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                             MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-
-    robot.set_left_motor_controller(left_motor_controller)
-    robot.set_right_motor_controller(right_motor_controller)
-
-    robots.append(robot)
-    return robot
+def remove_robot():
+    global scene
+    scene.remove(robots.pop(0))
 
 
 def init_scene():
     global scene
+    global robots
 
+    robots = []
     scene = Scene()
     light = Light(600, 200, 16, Color.YELLOW, Color.BLACK, 20)
     light2 = Light(700, 250, 16, Color.YELLOW, Color.BLACK, 20)
     light3 = Light(100, 450, 16, Color.YELLOW, Color.BLACK, 20)
     light4 = Light(60, 100, 16, Color.YELLOW, Color.BLACK, 20)
 
-    robot1 = build_robot_1()
-    robot2 = build_robot_2()
+    build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
+    build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
-    # TODO AGGIUNGERE ALLA SCENA DIRETTAMENTE TUTTA LA LISTA ROBOTS
-    scene.put(robot1)
-    scene.put(robot2)
+    scene.put(robots)
 
     scene.put(light)
     scene.put(light2)
@@ -112,6 +106,10 @@ if __name__ == '__main__':
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
                 init_scene()
+            elif event.type == KEYDOWN and event.key == K_PLUS:
+                add_robot()
+            elif event.type == KEYDOWN and event.key == K_MINUS:
+                remove_robot()
 
         # teletrasporto ai margini
         for robot in robots:
