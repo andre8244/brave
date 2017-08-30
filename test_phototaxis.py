@@ -13,9 +13,6 @@ from actuator import Actuator
 from motor_controller import MotorController
 
 
-# TODO AGGIUNGERE E RIMUOVERE LUCI CASUALMENTE
-# TODO CONTROLLO VELOCITA' SIMULAZIONE
-
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 
 ROBOT_SIZE = 30
@@ -28,8 +25,11 @@ MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
+SCENE_SPEED_INITIAL = 25
+
 scene = None
 robots = None
+lights = None
 
 
 def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
@@ -54,39 +54,87 @@ def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
     return robot
 
 
-def add_robot():
+def build_light(x, y, emitting_power, color_fg, color_bg):
+    global lights
+    light = Light(x, y, emitting_power, color_fg, color_bg)
+    lights.append(light)
+    return light
+
+
+def add_robots(number_to_add=1):
     global scene
-    x = random.randint(0, SCREEN_WIDTH)
-    y = random.randint(0, SCREEN_HEIGHT)
-    robot = build_robot(x, y, 10, math.pi / 4)
-    scene.put(robot)
+    global robots
+
+    for i in range(number_to_add):
+        x = random.randint(0, SCREEN_WIDTH)
+        y = random.randint(0, SCREEN_HEIGHT)
+        robot = build_robot(x, y, 10, math.pi / 4)
+        scene.put(robot)
+    print('number of robots:', len(robots))
 
 
 def remove_robot():
     global scene
-    scene.remove(robots.pop(0))
+    global robots
+
+    if len(robots) > 0:
+        scene.remove(robots.pop(0))
+    print('number of robots:', len(robots))
+
+
+def add_lights(number_to_add=1):
+    global scene
+    global lights
+
+    for i in range(number_to_add):
+        x = random.randint(0, SCREEN_WIDTH)
+        y = random.randint(0, SCREEN_HEIGHT)
+        emitting_power = random.randint(10, 25)
+        light = build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
+        scene.put(light)
+    print('number of lights:', len(lights))
+
+
+def remove_light():
+    global scene
+    global lights
+
+    if len(lights) > 0:
+        scene.remove(lights.pop(0))
+    print('number of lights:', len(lights))
 
 
 def init_scene():
     global scene
     global robots
+    global lights
 
     robots = []
-    scene = Scene()
-    light = Light(600, 200, 16, Color.YELLOW, Color.BLACK, 20)
-    light2 = Light(700, 250, 16, Color.YELLOW, Color.BLACK, 20)
-    light3 = Light(100, 450, 16, Color.YELLOW, Color.BLACK, 20)
-    light4 = Light(60, 100, 16, Color.YELLOW, Color.BLACK, 20)
+    lights = []
+    scene = Scene(SCENE_SPEED_INITIAL)
 
-    build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
-    build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
+    add_robots(5)
+    add_lights(4)
 
-    scene.put(robots)
+    # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
+    # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
+    # build_light(100, 450, 30, Color.YELLOW, Color.BLACK)
+    # build_light(60, 100, 20, Color.YELLOW, Color.BLACK)
+    #
+    # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
+    # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
-    scene.put(light)
-    scene.put(light2)
-    scene.put(light3)
-    scene.put(light4)
+
+def increase_scene_speed():
+    if scene.speed < 200:
+        scene.speed *= 1.5
+    print('scene.speed:', scene.speed)
+
+
+def decrease_scene_speed():
+    if scene.speed > 1:
+        scene.speed /= 1.5
+    print('scene.speed:', scene.speed)
 
 
 if __name__ == '__main__':
@@ -106,10 +154,18 @@ if __name__ == '__main__':
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
                 init_scene()
-            elif event.type == KEYDOWN and event.key == K_PLUS:
-                add_robot()
-            elif event.type == KEYDOWN and event.key == K_MINUS:
+            elif event.type == KEYDOWN and event.key == K_k:
+                add_robots()
+            elif event.type == KEYDOWN and event.key == K_l:
                 remove_robot()
+            elif event.type == KEYDOWN and event.key == K_COMMA:
+                add_lights()
+            elif event.type == KEYDOWN and event.key == K_PERIOD:
+                remove_light()
+            elif event.type == KEYDOWN and event.key == K_PLUS:
+                increase_scene_speed()
+            elif event.type == KEYDOWN and event.key == K_MINUS:
+                decrease_scene_speed()
 
         # teletrasporto ai margini
         for robot in robots:
@@ -130,5 +186,6 @@ if __name__ == '__main__':
             obj.draw(screen)
 
         pygame.display.flip()
-        clock.tick(25)
+        int_scene_speed = int(round(scene.speed))
+        clock.tick(int_scene_speed)
 

@@ -1,3 +1,5 @@
+import random
+
 from math import sin, cos, pi
 from rot_triangle import RotTriangle
 from color import Color
@@ -6,7 +8,8 @@ from color import Color
 class DifferentialDriveRobot(RotTriangle):
 
     def __init__(self, x, y, length, wheel_radius):
-        super().__init__(x, y, length, Color.random_color(127, 127, 127), Color.BLACK, 0)
+        direction = random.uniform(-pi, pi)
+        super().__init__(x, y, length, Color.random_color(127, 127, 127), Color.BLACK, direction)
         self.length = length
         self.wheel_radius = wheel_radius
         self.speed_left_wheel = 0.0     # angular velocity of left wheel
