@@ -1,6 +1,8 @@
 from sensor import Sensor
 from light import Light
 from math import atan2, sin, cos
+
+
 class LightSensor(Sensor):
 
     def __init__(self, robot, delta_direction, saturation_value, scene):
