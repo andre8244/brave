@@ -1,7 +1,8 @@
 class Scene:
 
-    def __init__(self, speed):
+    def __init__(self, speed, screen):
         self.speed = speed
+        self.screen = screen
         self.objects = []
 
     def put(self, obj):

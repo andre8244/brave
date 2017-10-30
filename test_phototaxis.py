@@ -19,6 +19,7 @@ ROBOT_SIZE = 30
 ROBOT_WHEEL_SPEED_DELTA = 3
 
 LIGHT_SENSOR_SATURATION_VALUE = 100
+LIGHT_SENSOR_ERROR = 0.1
 
 MOTOR_CONTROLLER_COEFFICIENT = 1.5
 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
@@ -26,6 +27,9 @@ MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
 SCENE_SPEED_INITIAL = 25
+
+N_ROBOTS = 5
+N_LIGHTS = 5
 
 scene = None
 robots = None
@@ -38,8 +42,8 @@ def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
 
     robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    left_light_sensor = LightSensor(robot, light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, scene)
-    right_light_sensor = LightSensor(robot, -light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, scene)
+    left_light_sensor = LightSensor(robot, light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
+    right_light_sensor = LightSensor(robot, -light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
     left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
@@ -104,17 +108,17 @@ def remove_light():
     print('number of lights:', len(lights))
 
 
-def init_scene():
+def init_scene(screen):
     global scene
     global robots
     global lights
 
     robots = []
     lights = []
-    scene = Scene(SCENE_SPEED_INITIAL)
+    scene = Scene(SCENE_SPEED_INITIAL, screen)
 
-    add_robots(5)
-    add_lights(4)
+    add_robots(N_ROBOTS)
+    add_lights(N_LIGHTS)
 
     # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
     # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
@@ -142,7 +146,7 @@ if __name__ == '__main__':
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
-    init_scene()
+    init_scene(screen)
 
     tick = 0
 
@@ -153,7 +157,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
-                init_scene()
+                init_scene(screen)
             elif event.type == KEYDOWN and event.key == K_k:
                 add_robots()
             elif event.type == KEYDOWN and event.key == K_l:
