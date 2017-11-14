@@ -5,11 +5,14 @@ import geometry
 from pygame.locals import *
 from color import Color
 from point import Point
+from obstacle import Obstacle
+
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 
 test_num = 0
 tests = None
+
 
 class Test:
     def __init__(self, point1, point2, point3, point4):
@@ -84,14 +87,22 @@ if __name__ == '__main__':
         pygame.draw.line(screen, Color.GREEN, (a1.x, a1.y), (a2.x, a2.y))
         pygame.draw.line(screen, Color.RED, (b1.x, b1.y), (b2.x, b2.y))
 
-        intersect = geometry.check_segments_instersect(seg_1, seg_2)
+        # intersect = geometry.check_segments_instersect(seg_1, seg_2)
+        intersect = geometry.segments_intersection(seg_1, seg_2)
+        print("intersect:", intersect)
 
-        if intersect:
+        if intersect is not None:
             color_res = Color.GREEN
         else:
             color_res = Color.RED
 
         pygame.draw.circle(screen, color_res, (int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT /2)), 30)
 
+        point_list = [(300, 300), (400, 500), (200, 400)]
+        # pygame.draw.polygon(screen, Color.YELLOW, point_list)
+
+        box = Obstacle(700, 200, 50, Color.YELLOW)
+        box.draw(screen)
+
         pygame.display.flip()
-        clock.tick(25)
+        clock.tick(15)

@@ -1,3 +1,4 @@
 .idea/**
 braitenberg.iml
 __pycache__/**
+out/**

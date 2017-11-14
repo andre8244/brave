@@ -7,8 +7,8 @@ from pygame.locals import *
 from sensor_driven_robot import SensorDrivenRobot
 from color import Color
 from scene import Scene
-from light import Light
-from light_sensor import LightSensor
+from obstacle import Obstacle
+from obstacle_sensor import ObstacleSensor
 from actuator import Actuator
 from motor_controller import MotorController
 
@@ -18,48 +18,38 @@ SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 ROBOT_SIZE = 30
 ROBOT_WHEEL_SPEED_DELTA = 3
 
-LIGHT_SENSOR_SATURATION_VALUE = 100
-LIGHT_SENSOR_ERROR = 0.1
+OBSTACLE_SENSOR_MAX_DISTANCE = 200
+OBSTACLE_SENSOR_ERROR = 0.1
 
-MOTOR_CONTROLLER_COEFFICIENT = 0.5
+MOTOR_CONTROLLER_COEFFICIENT = 1
 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
-SCENE_SPEED_INITIAL = 25
+SCENE_SPEED_INITIAL = 1
 
-N_ROBOTS = 5
-N_LIGHTS = 5
-
-PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
+N_ROBOTS = 0
+N_BOXES = 0
 
 scene = None
 robots = None
-lights = None
+boxes = None
 
 
-def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
+def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
     global scene
     global robots
 
     robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    left_light_sensor = LightSensor(robot, light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
-    right_light_sensor = LightSensor(robot, -light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
+    left_obstacle_sensor = ObstacleSensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_MAX_DISTANCE, OBSTACLE_SENSOR_ERROR, scene)
+    right_obstacle_sensor = ObstacleSensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_MAX_DISTANCE, OBSTACLE_SENSOR_ERROR, scene)
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
-
-    if (PHOTOTAXIS):
-        left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                                MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-        right_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                                 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-    else:
-        # ANTI-PHOTOTAXIS
-        left_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                                MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-        right_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                                 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+    left_motor_controller = MotorController(left_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
+                                            MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+    right_motor_controller = MotorController(right_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
+                                             MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
 
     robot.set_left_motor_controller(left_motor_controller)
     robot.set_right_motor_controller(right_motor_controller)
@@ -68,11 +58,12 @@ def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
     return robot
 
 
-def build_light(x, y, emitting_power, color_fg, color_bg):
-    global lights
-    light = Light(x, y, emitting_power, color_fg, color_bg)
-    lights.append(light)
-    return light
+def build_box(x, y, size, color):
+    global boxes
+
+    box = Obstacle(x, y, size, color)
+    boxes.append(box)
+    return box
 
 
 def add_robots(number_to_add=1):
@@ -96,47 +87,51 @@ def remove_robot():
     print('number of robots:', len(robots))
 
 
-def add_lights(number_to_add=1):
+def add_boxes(number_to_add=1):
     global scene
-    global lights
+    global boxes
 
     for i in range(number_to_add):
         x = random.randint(0, SCREEN_WIDTH)
         y = random.randint(0, SCREEN_HEIGHT)
-        emitting_power = random.randint(10, 25)
-        light = build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
-        scene.put(light)
-    print('number of lights:', len(lights))
+
+        size = random.randint(20, 60)
+        box = build_box(x, y, size, Color.random_color(127, 127, 127))
+        scene.put(box)
+
+    print('number of boxes:', len(boxes))
 
 
-def remove_light():
+def remove_box():
     global scene
-    global lights
+    global boxes
 
-    if len(lights) > 0:
-        scene.remove(lights.pop(0))
-    print('number of lights:', len(lights))
+    if len(boxes) > 0:
+        scene.remove(boxes.pop(0))
+    print('number of boxes:', len(boxes))
 
 
 def init_scene(screen):
     global scene
     global robots
-    global lights
+    global boxes
 
     robots = []
-    lights = []
+    boxes = []
     scene = Scene(SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
-    add_lights(N_LIGHTS)
+    add_boxes(N_BOXES)
 
-    # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
-    # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
-    # build_light(100, 450, 30, Color.YELLOW, Color.BLACK)
-    # build_light(60, 100, 20, Color.YELLOW, Color.BLACK)
-    #
     # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
     # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
+
+    # build_robot(300, 300, 10, math.pi / 4)
+    build_robot(400, 300, 10, math.pi / 4)
+    robots[0].direction = 0
+    build_box(450, 380, 60, Color.YELLOW)
+    scene.put(robots)
+    scene.put(boxes)
 
 
 def increase_scene_speed():
@@ -173,9 +168,9 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and event.key == K_l:
                 remove_robot()
             elif event.type == KEYDOWN and event.key == K_COMMA:
-                add_lights()
+                add_boxes()
             elif event.type == KEYDOWN and event.key == K_PERIOD:
-                remove_light()
+                remove_box()
             elif event.type == KEYDOWN and event.key == K_PLUS:
                 increase_scene_speed()
             elif event.type == KEYDOWN and event.key == K_MINUS:

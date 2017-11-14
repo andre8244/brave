@@ -51,8 +51,7 @@ class LightSensor(Sensor):
             # percentage standard deviation
             percentage_std_dev = self.error * total_value
             total_value_with_error = random.gauss(total_value, percentage_std_dev)
-
-        return total_value_with_error
+            return total_value_with_error
 
     def draw(self):
         dir_sensor = self.robot.direction + self.delta_direction
