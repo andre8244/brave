@@ -2,3 +2,5 @@
 braitenberg.iml
 __pycache__/**
 out/**
+venv/**
+.directory
