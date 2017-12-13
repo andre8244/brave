@@ -158,10 +158,10 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     init_scene(screen)
 
-    tick = 0
+    # tick = 0
 
     while True:
-        keys_pressed = pygame.key.get_pressed()
+        # keys_pressed = pygame.key.get_pressed()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):

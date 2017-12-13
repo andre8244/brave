@@ -18,6 +18,7 @@ class MotorController:
         sensor_value = self.sensor.get_value()
         weighted_value = self.coefficient * sensor_value
         self.actuator.value = weighted_value + self.min_actuator_value
+        # print("  ## self.actuator.value:", self.actuator.value)
 
     def get_actuator_value(self):
         return self.actuator.value

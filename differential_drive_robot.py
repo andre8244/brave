@@ -29,8 +29,8 @@ class DifferentialDriveRobot(RotTriangle):
 
     def print_xyd(self):
         """ prints the x,y position and direction """
-        print ("x = " + str(self.x) +" "+ "y = " + str(self.y))
-        print ("direction = " + str(self.direction))
+        print("x = " + str(self.x) +" "+ "y = " + str(self.y))
+        print("direction = " + str(self.direction))
 
     def delta_x(self):
         self.x += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * cos(-self.direction)

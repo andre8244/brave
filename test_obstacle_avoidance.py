@@ -18,18 +18,19 @@ SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 ROBOT_SIZE = 30
 ROBOT_WHEEL_SPEED_DELTA = 3
 
-OBSTACLE_SENSOR_MAX_DISTANCE = 200
+OBSTACLE_SENSOR_MAX_DISTANCE = 100
+OBSTACLE_SENSOR_SATURATION_VALUE = 50
 OBSTACLE_SENSOR_ERROR = 0.1
 
-MOTOR_CONTROLLER_COEFFICIENT = 1
+MOTOR_CONTROLLER_COEFFICIENT = 300
 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
 SCREEN_MARGIN = ROBOT_SIZE / 2
 
-SCENE_SPEED_INITIAL = 1
+SCENE_SPEED_INITIAL = 25
 
-N_ROBOTS = 0
-N_BOXES = 0
+N_ROBOTS = 10
+N_BOXES = 10
 
 scene = None
 robots = None
@@ -42,8 +43,10 @@ def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
 
     robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    left_obstacle_sensor = ObstacleSensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_MAX_DISTANCE, OBSTACLE_SENSOR_ERROR, scene)
-    right_obstacle_sensor = ObstacleSensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_MAX_DISTANCE, OBSTACLE_SENSOR_ERROR, scene)
+    left_obstacle_sensor = ObstacleSensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+                                          OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
+    right_obstacle_sensor = ObstacleSensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+                                           OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
     left_motor_controller = MotorController(left_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
@@ -73,7 +76,7 @@ def add_robots(number_to_add=1):
     for i in range(number_to_add):
         x = random.randint(0, SCREEN_WIDTH)
         y = random.randint(0, SCREEN_HEIGHT)
-        robot = build_robot(x, y, 10, math.pi / 4)
+        robot = build_robot(x, y, 10, math.pi / 8)
         scene.put(robot)
     print('number of robots:', len(robots))
 
@@ -127,11 +130,15 @@ def init_scene(screen):
     # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
     # build_robot(300, 300, 10, math.pi / 4)
-    build_robot(400, 300, 10, math.pi / 4)
-    robots[0].direction = 0
-    build_box(450, 380, 60, Color.YELLOW)
-    scene.put(robots)
-    scene.put(boxes)
+
+    # build_robot(400, 300, 10, math.pi / 4)
+    # robots[0].direction = 0
+    #
+    # build_box(450, 380, 60, Color.YELLOW)
+    # build_box(450, 220, 60, Color.YELLOW)
+
+    # scene.put(robots)
+    # scene.put(boxes)
 
 
 def increase_scene_speed():
@@ -153,10 +160,10 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     init_scene(screen)
 
-    tick = 0
+    # tick = 0
 
     while True:
-        keys_pressed = pygame.key.get_pressed()
+        # keys_pressed = pygame.key.get_pressed()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -188,6 +195,8 @@ if __name__ == '__main__':
                 robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
             if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
                 robot.y = -SCREEN_MARGIN
+
+            # print("robot rect:", robot.rect)
 
         screen.fill(Color.BLACK)
 

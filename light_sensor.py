@@ -11,7 +11,6 @@ class LightSensor(Sensor):
 
     LENGTH_SENSOR_LINE = 100
 
-
     def __init__(self, robot, delta_direction, saturation_value, error, scene):
         super().__init__(robot, delta_direction, saturation_value, error, scene)
 
