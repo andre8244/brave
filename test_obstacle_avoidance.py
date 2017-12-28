@@ -8,14 +8,14 @@ from sensor_driven_robot import SensorDrivenRobot
 from color import Color
 from scene import Scene
 from obstacle import Obstacle
-from obstacle_sensor import ObstacleSensor
+from proximity_sensor import ProximitySensor
 from actuator import Actuator
 from motor_controller import MotorController
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 
-ROBOT_SIZE = 30
+ROBOT_SIZE = 25
 ROBOT_WHEEL_SPEED_DELTA = 3
 
 OBSTACLE_SENSOR_MAX_DISTANCE = 100
@@ -43,10 +43,10 @@ def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
 
     robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    left_obstacle_sensor = ObstacleSensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
-                                          OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
-    right_obstacle_sensor = ObstacleSensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+    left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
                                            OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
+    right_obstacle_sensor = ProximitySensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+                                            OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
     left_motor_controller = MotorController(left_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
@@ -129,14 +129,13 @@ def init_scene(screen):
     # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
     # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
-    # build_robot(300, 300, 10, math.pi / 4)
-
     # build_robot(400, 300, 10, math.pi / 4)
     # robots[0].direction = 0
-    #
-    # build_box(450, 380, 60, Color.YELLOW)
+
+    # build_box(550, 280, 100, Color.YELLOW)
     # build_box(450, 220, 60, Color.YELLOW)
 
+    # commentare in caso di robot generati casualmente
     # scene.put(robots)
     # scene.put(boxes)
 

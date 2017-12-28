@@ -7,18 +7,9 @@ class MotorController:
         self.min_actuator_value = min_actuator_value
 
     def sense_and_act(self):
-        # sensor_value = self.sensor.get_value()
-        # actuator_value = self.coefficient * sensor_value
-        #
-        # if actuator_value < self.min_actuator_value:
-        #     actuator_value = self.min_actuator_value
-        #
-        # self.actuator.value = actuator_value
-
         sensor_value = self.sensor.get_value()
         weighted_value = self.coefficient * sensor_value
         self.actuator.value = weighted_value + self.min_actuator_value
-        # print("  ## self.actuator.value:", self.actuator.value)
 
     def get_actuator_value(self):
         return self.actuator.value

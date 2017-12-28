@@ -7,17 +7,18 @@ from obstacle import Obstacle
 from math import sin, cos
 from color import Color
 from point import Point
+from collision import Collision
 
 
-class ObstacleSensor(Sensor):
+class ProximitySensor(Sensor):
+
+    COLLISION_DISTANCE = 6  # px
 
     def __init__(self, robot, delta_direction, saturation_value, error, max_distance, scene):
         super().__init__(robot, delta_direction, saturation_value, error, scene)
         self.max_distance = max_distance
 
     def get_value(self):
-        # x_robot = self.robot.x
-        # y_robot = -self.robot.y
         dir_sensor = self.robot.direction + self.delta_direction
         x_sensor_eol = self.robot.x + self.max_distance * cos(dir_sensor)
         y_sensor_eol = self.robot.y + self.max_distance * -sin(dir_sensor)
@@ -27,18 +28,12 @@ class ObstacleSensor(Sensor):
 
         sensor_ray = (point_robot, point_sensor_eol)
         # print("sensor_ray:", geometry.segment_to_string(sensor_ray))
-        distance_from_nearer_obstacle = None
+        distance_from_nearest_obstacle = None
+        nearest_obstacle = None
 
         for obj in self.scene.objects:
             if issubclass(type(obj), Obstacle):
                 obstacle = obj
-
-                # cambio SDR
-                # x_obstacle = obstacle.x
-                # y_obstacle = -obstacle.y
-                #
-                # x_obstacle -= x_robot
-                # y_obstacle -= y_robot
 
                 # check collision between obstacle edges and sensor ray
                 for obstacle_edge in obstacle.edges:
@@ -49,27 +44,22 @@ class ObstacleSensor(Sensor):
                         # print("intersection_point:", geometry.point_to_string(intersection_point))
                         distance_from_obstacle = geometry.distance(point_robot, intersection_point)
 
-                        if distance_from_nearer_obstacle is None or distance_from_obstacle < distance_from_nearer_obstacle:
-                            distance_from_nearer_obstacle = distance_from_obstacle
-                            # print("new distance_from_nearer_obstacle:", distance_from_nearer_obstacle)
+                        if distance_from_nearest_obstacle is None or distance_from_obstacle < distance_from_nearest_obstacle:
+                            distance_from_nearest_obstacle = distance_from_obstacle
+                            nearest_obstacle = obstacle
+                            # print("new distance_from_nearest_obstacle:", distance_from_nearest_obstacle)
 
-        if distance_from_nearer_obstacle is None:
-            # print("@ NO OBSTACLE DETECTED")
+        if distance_from_nearest_obstacle is None:
+            # no obstacle detected
             return 0
         else:
-
-            # print("@ OBSTACLE DETECTED:", distance_from_nearer_obstacle)
+            # check collision
+            if distance_from_nearest_obstacle < self.COLLISION_DISTANCE:
+                raise Collision(self.robot, nearest_obstacle)
 
             # percentage standard deviation
-            percentage_std_dev = self.error * distance_from_nearer_obstacle
-            distance_with_error = random.gauss(distance_from_nearer_obstacle, percentage_std_dev)
-
-            # print("@ distance with error:", distance_with_error, "returning proximity:", str(1 / distance_with_error))
-
-            # avoid division by zero
-            if distance_with_error < geometry.EPSILON:
-                distance_with_error = geometry.EPSILON
-
+            percentage_std_dev = self.error * distance_from_nearest_obstacle
+            distance_with_error = random.gauss(distance_from_nearest_obstacle, percentage_std_dev)
             proximity_value = 1 / distance_with_error
 
             if proximity_value > self.saturation_value:
