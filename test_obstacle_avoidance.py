@@ -7,10 +7,12 @@ from pygame.locals import *
 from sensor_driven_robot import SensorDrivenRobot
 from color import Color
 from scene import Scene
-from obstacle import Obstacle
+from box import Box
+from wall import Wall
 from proximity_sensor import ProximitySensor
 from actuator import Actuator
 from motor_controller import MotorController
+from point import Point
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
@@ -31,10 +33,11 @@ SCENE_SPEED_INITIAL = 25
 
 N_ROBOTS = 10
 N_BOXES = 10
+N_WALLS = 3
 
 scene = None
 robots = None
-boxes = None
+obstacles = None
 
 
 def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
@@ -62,11 +65,19 @@ def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
 
 
 def build_box(x, y, size, color):
-    global boxes
+    global obstacles
 
-    box = Obstacle(x, y, size, color)
-    boxes.append(box)
+    box = Box(x, y, size, color)
+    obstacles.append(box)
     return box
+
+
+def build_wall(point1, point2, color):
+    global obstacles
+
+    wall = Wall(point1, point2, color)
+    obstacles.append(wall)
+    return wall
 
 
 def add_robots(number_to_add=1):
@@ -92,7 +103,7 @@ def remove_robot():
 
 def add_boxes(number_to_add=1):
     global scene
-    global boxes
+    global obstacles
 
     for i in range(number_to_add):
         x = random.randint(0, SCREEN_WIDTH)
@@ -102,29 +113,52 @@ def add_boxes(number_to_add=1):
         box = build_box(x, y, size, Color.random_color(127, 127, 127))
         scene.put(box)
 
-    print('number of boxes:', len(boxes))
+    print('number of obstacles:', len(obstacles))
+
+
+def add_walls(number_to_add=1):
+    global scene
+    global obstacles
+
+    for i in range(number_to_add):
+        x1 = random.randint(0, SCREEN_WIDTH)
+        y1 = random.randint(0, SCREEN_HEIGHT)
+        point1 = Point(x1, y1)
+
+        x2 = random.randint(0, SCREEN_WIDTH)
+        y2 = random.randint(0, SCREEN_HEIGHT)
+        point2 = Point(x2, y2)
+
+        wall = build_wall(point1, point2, Color.random_color(127, 127, 127))
+        scene.put(wall)
+
+    print('number of obstacles:', len(obstacles))
 
 
 def remove_box():
     global scene
-    global boxes
+    global obstacles
 
-    if len(boxes) > 0:
-        scene.remove(boxes.pop(0))
-    print('number of boxes:', len(boxes))
+    if len(obstacles) > 0:
+        scene.remove(obstacles.pop(0))
+    print('number of obstacles:', len(obstacles))
 
 
 def init_scene(screen):
     global scene
     global robots
-    global boxes
+    global obstacles
 
     robots = []
-    boxes = []
+    obstacles = []
     scene = Scene(SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
     add_boxes(N_BOXES)
+    add_walls(N_WALLS)
+
+    # wall = Wall(Point(0,0), Point(300, 500), Color.YELLOW)
+    # scene.put(wall)
 
     # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
     # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)

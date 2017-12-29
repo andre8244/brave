@@ -7,12 +7,12 @@ from obstacle import Obstacle
 from math import sin, cos
 from color import Color
 from point import Point
-from collision import Collision
+from collision_exception import Collision
 
 
 class ProximitySensor(Sensor):
 
-    COLLISION_DISTANCE = 6  # px
+    COLLISION_DISTANCE = 8  # px
 
     def __init__(self, robot, delta_direction, saturation_value, error, max_distance, scene):
         super().__init__(robot, delta_direction, saturation_value, error, scene)

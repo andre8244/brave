@@ -1,5 +1,5 @@
 from differential_drive_robot import DifferentialDriveRobot
-from collision import Collision
+from collision_exception import Collision
 
 
 class SensorDrivenRobot(DifferentialDriveRobot):
@@ -7,6 +7,8 @@ class SensorDrivenRobot(DifferentialDriveRobot):
     def __init__(self, x, y, length, wheel_radius):
         super().__init__(x, y, length, wheel_radius)
         self.collision_with_object = False
+        self.left_motor_controller = None
+        self.right_motor_controller = None
 
     def sense_and_act(self):
         if not self.collision_with_object:
@@ -37,4 +39,4 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         self.left_motor_controller.sensor.draw()
         self.right_motor_controller.sensor.draw()
         # call super method to draw the robot
-        super(SensorDrivenRobot, self).draw(screen)
+        super().draw(screen)

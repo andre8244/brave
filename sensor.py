@@ -1,4 +1,4 @@
-class Sensor():
+class Sensor:
 
     def __init__(self, robot, delta_direction, saturation_value, error, scene):
         self.robot = robot
