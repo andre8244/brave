@@ -1,5 +1,5 @@
-from differential_drive_robot import DifferentialDriveRobot
-from collision_exception import Collision
+from robot.differential_drive_robot import DifferentialDriveRobot
+from exception.collision_exception import Collision
 
 
 class SensorDrivenRobot(DifferentialDriveRobot):

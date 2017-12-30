@@ -4,14 +4,14 @@ import math
 import random
 
 from pygame.locals import *
-from sensor_driven_robot import SensorDrivenRobot
+from robot.sensor_driven_robot import SensorDrivenRobot
 from color import Color
 from scene import Scene
-from box import Box
-from wall import Wall
-from proximity_sensor import ProximitySensor
+from scene.box import Box
+from scene.wall import Wall
+from sensor.proximity_sensor import ProximitySensor
 from actuator import Actuator
-from motor_controller import MotorController
+from robot.motor_controller import MotorController
 from point import Point
 
 

@@ -3,11 +3,11 @@ import pygame
 import geometry
 
 from sensor import Sensor
-from obstacle import Obstacle
+from scene.obstacle import Obstacle
 from math import sin, cos
 from color import Color
 from point import Point
-from collision_exception import Collision
+from exception.collision_exception import Collision
 
 
 class ProximitySensor(Sensor):

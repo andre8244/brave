@@ -4,13 +4,13 @@ import math
 import random
 
 from pygame.locals import *
-from sensor_driven_robot import SensorDrivenRobot
+from robot.sensor_driven_robot import SensorDrivenRobot
 from color import Color
 from scene import Scene
-from light import Light
-from light_sensor import LightSensor
+from scene.light import Light
+from sensor.light_sensor import LightSensor
 from actuator import Actuator
-from motor_controller import MotorController
+from robot.motor_controller import MotorController
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600

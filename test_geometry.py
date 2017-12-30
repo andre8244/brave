@@ -5,7 +5,7 @@ import geometry
 from pygame.locals import *
 from color import Color
 from point import Point
-from obstacle import Obstacle
+from scene.obstacle import Obstacle
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600

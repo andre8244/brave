@@ -1,5 +1,5 @@
 from point import Point
-from obstacle import Obstacle
+from scene.obstacle import Obstacle
 
 
 class Box(Obstacle):
