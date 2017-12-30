@@ -1,7 +1,7 @@
 import random
 import pygame
 
-from sensor import Sensor
+from sensor.sensor import Sensor
 from scene.light import Light
 from math import atan2, sin, cos
 from color import Color

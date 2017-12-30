@@ -1,6 +1,6 @@
 .idea/**
 braitenberg.iml
-__pycache__/**
+**/__pycache__/**
 out/**
 venv/**
 .directory

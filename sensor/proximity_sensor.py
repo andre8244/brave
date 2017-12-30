@@ -2,7 +2,7 @@ import random
 import pygame
 import geometry
 
-from sensor import Sensor
+from sensor.sensor import Sensor
 from scene.obstacle import Obstacle
 from math import sin, cos
 from color import Color
