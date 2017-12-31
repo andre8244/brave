@@ -13,6 +13,7 @@ from sensor.proximity_sensor import ProximitySensor
 from actuator import Actuator
 from robot.motor_controller import MotorController
 from point import Point
+from time_util import TimeUtil
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
@@ -33,7 +34,7 @@ SCENE_SPEED_INITIAL = 25
 
 N_ROBOTS = 10
 N_BOXES = 10
-N_WALLS = 3
+N_WALLS = 0
 
 scene = None
 robots = None
@@ -186,6 +187,21 @@ def decrease_scene_speed():
     print('scene.speed:', scene.speed)
 
 
+def save_scene():
+    file_name = "scene-" + str(TimeUtil.current_time_millis()) + ".txt"
+    file_path = 'saved_scene/' + file_name
+    
+    with open(file_path, 'w') as f:
+        for obj in scene.objects:
+            if hasattr(obj, 'to_string'):
+                line = obj.to_string()
+                f.write(line + '\n')
+            else:
+                print('Object unsaved:', obj)
+    f.closed
+    print('File path:', file_path)
+
+
 if __name__ == '__main__':
     pygame.init()
 
@@ -215,6 +231,8 @@ if __name__ == '__main__':
                 increase_scene_speed()
             elif event.type == KEYDOWN and event.key == K_MINUS:
                 decrease_scene_speed()
+            elif event.type == KEYDOWN and event.key == K_s:
+                save_scene()
 
         # teletrasporto ai margini
         for robot in robots:
