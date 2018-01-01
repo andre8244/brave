@@ -1,6 +1,8 @@
+import pygame
+
 from robot.differential_drive_robot import DifferentialDriveRobot
 from exception.collision_exception import Collision
-
+from color import Color
 
 class SensorDrivenRobot(DifferentialDriveRobot):
 
@@ -9,6 +11,7 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         self.collision_with_object = False
         self.left_motor_controller = None
         self.right_motor_controller = None
+        self.label = None
 
     def sense_and_act(self):
         if not self.collision_with_object:
@@ -36,7 +39,24 @@ class SensorDrivenRobot(DifferentialDriveRobot):
 
     def draw(self, screen):
         # draw the sensor lines
-        self.left_motor_controller.sensor.draw()
-        self.right_motor_controller.sensor.draw()
+
+        # in scene_loader a robot doesn't have sensors
+        if self.left_motor_controller is not None:
+            self.left_motor_controller.sensor.draw()
+            self.right_motor_controller.sensor.draw()
+
         # call super method to draw the robot
         super().draw(screen)
+
+    def get_saved_scene_repr(self):
+        return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y)
+
+    def set_label(self, label):
+        self.label = label
+
+    def draw_label(self, screen):
+        if pygame.font:
+            font = pygame.font.Font(None, 26)
+            text = font.render(str(self.label), 1, Color.YELLOW, Color.DARK_GRAY)
+            text_pos = pygame.Rect(self.x + (self.length / 2), self.y + (self.length / 2), 50, 50)
+            screen.blit(text, text_pos)

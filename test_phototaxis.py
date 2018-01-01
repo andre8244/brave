@@ -28,7 +28,7 @@ SCREEN_MARGIN = ROBOT_SIZE / 2
 
 SCENE_SPEED_INITIAL = 25
 
-N_ROBOTS = 5
+N_ROBOTS = 10
 N_LIGHTS = 5
 
 PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
@@ -125,7 +125,7 @@ def init_scene(screen):
 
     robots = []
     lights = []
-    scene = Scene(SCENE_SPEED_INITIAL, screen)
+    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
     add_lights(N_LIGHTS)
