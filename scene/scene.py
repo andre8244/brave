@@ -1,4 +1,4 @@
-from time_util import TimeUtil
+import time
 
 
 class Scene:
@@ -20,7 +20,8 @@ class Scene:
         self.objects.remove(obj)
 
     def save(self):
-        file_name = "scene-" + str(TimeUtil.current_time_millis()) + ".txt"
+        date_time = time.strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = "scene_" + date_time + ".txt"
         file_path = 'saved_scenes/' + file_name
 
         with open(file_path, 'w') as f:
