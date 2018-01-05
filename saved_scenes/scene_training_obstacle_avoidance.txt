@@ -1,0 +1,16 @@
+Scene 900 900
+SensorDrivenRobot 450 450
+Wall 5 5 895 5
+Wall 895 5 895 895
+Wall 895 895 5 895
+Wall 5 895 5 5
+Box 179 541 60
+Box 47 367 38
+Box 440 78 44
+Box 749 23 23
+Box 102 106 33
+Box 263 539 50
+Box 821 167 21
+Box 728 159 28
+Box 77 208 56
+Box 540 97 40

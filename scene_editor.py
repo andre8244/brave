@@ -1,5 +1,6 @@
 import sys
 import pygame
+import random
 
 from pygame.locals import *
 from color import Color
@@ -13,15 +14,19 @@ from robot.sensor_driven_robot import SensorDrivenRobot
 ROBOT_SIZE = 25
 ROBOT_WHEEL_RADIUS = 10
 
-SCENE_SPEED_INITIAL = 2
+SCENE_SPEED_INITIAL = 25
 
 screen = None
 scene = None
+boxes_added = None
+label = None
 
 
 def init_scene():
     global screen
     global scene
+    global boxes_added
+    global label
 
     if len(sys.argv) > 1:
         file_name = sys.argv[1]
@@ -67,6 +72,32 @@ def init_scene():
             line_number += 1
 
     f.closed
+    boxes_added = []
+    label = line_number
+
+
+def add_box_to_cursor():
+    global scene
+    global boxes_added
+    global label
+
+    x, y = pygame.mouse.get_pos()
+    size = random.randint(20, 60)
+    box = Box(x, y, size, Color.random_bright())
+    box.set_label(label)
+    label += 1
+    boxes_added.append(box)
+    scene.put(box)
+
+
+def remove_box():
+    global scene
+    global boxes_added
+    global label
+
+    if len(boxes_added) > 0:
+        scene.remove(boxes_added.pop())
+        label -= 1
 
 
 if __name__ == '__main__':
@@ -80,6 +111,12 @@ if __name__ == '__main__':
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
                 init_scene()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                add_box_to_cursor()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                remove_box()
+            elif event.type == KEYDOWN and event.key == K_s:
+                scene.save()
 
         screen.fill(Color.BLACK)
 

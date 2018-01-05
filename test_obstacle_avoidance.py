@@ -190,11 +190,6 @@ def decrease_scene_speed():
     print('scene.speed:', scene.speed)
 
 
-def save_scene():
-    global scene
-    scene.save()
-
-
 if __name__ == '__main__':
     pygame.init()
 
@@ -225,7 +220,7 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and event.key == K_MINUS:
                 decrease_scene_speed()
             elif event.type == KEYDOWN and event.key == K_s:
-                save_scene()
+                scene.save()
 
         # teletrasporto ai margini
         for robot in robots:
