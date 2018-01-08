@@ -19,7 +19,7 @@ robot = None
 def reset_scene():
     global robot
 
-    dd_robot = DifferentialDriveRobot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
+    robot = DifferentialDriveRobot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
 
 
 def print_wheels_speed():

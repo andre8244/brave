@@ -5,7 +5,7 @@ import geometry
 from pygame.locals import *
 from color import Color
 from point import Point
-from scene.obstacle import Obstacle
+from scene.box import Box
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         point_list = [(300, 300), (400, 500), (200, 400)]
         # pygame.draw.polygon(screen, Color.YELLOW, point_list)
 
-        box = Obstacle(700, 200, 50, Color.YELLOW)
+        box = Box(700, 200, 50, Color.YELLOW)
         box.draw(screen)
 
         pygame.display.flip()

@@ -22,13 +22,15 @@ robot = None
 def reset_scene():
     global robot
 
-    dd_robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, Color.GREEN, Color.BLACK, ROBOT_INITIAL_DIRECTION)
+    robot = RotTriangle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, ROBOT_SIZE, Color.GREEN, Color.BLACK, ROBOT_INITIAL_DIRECTION)
+
 
 def check_direction_limits():
     if robot.direction > pi:
         robot.direction -= 2 * pi
     elif robot.direction < -pi:
         robot.direction += 2 * pi
+
 
 def turn_left():
     if robot.speed >= 0:

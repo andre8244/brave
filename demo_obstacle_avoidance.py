@@ -33,7 +33,7 @@ SCENE_SPEED_INITIAL = 25
 
 N_ROBOTS = 10
 N_BOXES = 10
-N_WALLS = 2
+N_WALLS = 0
 
 scene = None
 robots = None
