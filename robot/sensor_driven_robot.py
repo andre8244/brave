@@ -4,6 +4,7 @@ from robot.differential_drive_robot import DifferentialDriveRobot
 from exception.collision_exception import Collision
 from color import Color
 
+
 class SensorDrivenRobot(DifferentialDriveRobot):
 
     def __init__(self, x, y, length, wheel_radius):
