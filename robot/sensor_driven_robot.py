@@ -48,8 +48,9 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         # call super method to draw the robot
         super().draw(screen)
 
-    def get_saved_scene_repr(self):
-        return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y)
+    # todo delete
+    # def get_saved_scene_repr(self):
+    #     return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y)
 
     def set_label(self, label):
         self.label = label

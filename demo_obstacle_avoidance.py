@@ -10,7 +10,7 @@ from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall
 from sensor.proximity_sensor import ProximitySensor
-from actuator import Actuator
+from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 from point import Point
 

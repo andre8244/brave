@@ -9,7 +9,7 @@ from color import Color
 from scene.scene import Scene
 from scene.light import Light
 from sensor.light_sensor import LightSensor
-from actuator import Actuator
+from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 
 

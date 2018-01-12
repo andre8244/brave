@@ -1,5 +1,4 @@
 Scene 900 900
-SensorDrivenRobot 450.0 450.0
 Wall 5 5 895 5
 Wall 895 5 895 895
 Wall 895 895 5 895
