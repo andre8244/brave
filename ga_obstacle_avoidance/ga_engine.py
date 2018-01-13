@@ -1,4 +1,4 @@
-from robot.sensor_driven_robot import SensorDrivenRobot
+from ga_obstacle_avoidance.ga_robot import GaRobot
 from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
@@ -12,19 +12,26 @@ OBSTACLE_SENSOR_ERROR = 0.1
 # OBSTACLE_SENSOR_SATURATION_VALUE = 50
 # MOTOR_CONTROLLER_COEFFICIENT = 300
 # MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
+# WHEEL_RADIUS = 10
+# SENSOR_DIRECTION = math.pi / 8
 
 
 class GaEngine:
 
+    # todo keep genomes in a list?
+    # todo keep last genomes in a variable (for save to file feature)
+
     def __init__(self, scene, initial_population):
         self.scene = scene
         self.population = []
+        self.genomes = []
+        self.generation_count = 1
 
         for i in range(initial_population):
             x = scene.width / 2
             y = scene.height / 2
             genome = Genome.random()
-            # robot = self.build_robot(x, y, 10, math.pi / 8)
+            self.genomes.append(genome)
             robot = self.build_robot(x, y, genome)
             scene.put(robot)
             self.population.append(robot)
@@ -33,15 +40,21 @@ class GaEngine:
         for robot in self.population:
             robot.sense_and_act()
 
-            # ensure robots don't go accidentaly outside of the scene
+            # ensure robot doesn't accidentaly go outside of the scene
             if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
-                self.kill_robot(robot)
+                self.destroy_robot(robot)
 
-            # todo check robot.collision_with_object and possibly remove robot from population AND scene
-            # todo check population count and possibly create a new generation
+            # destroy robot if it collides an obstacle
+            if robot.collision_with_object:
+                self.destroy_robot(robot)
+
+            # check population extinction
+            if not self.population:
+                print('Extinction!')
+                # todo create a new generation
 
     def build_robot(self, x, y, genome):
-        robot = SensorDrivenRobot(x, y, ROBOT_SIZE, genome.robot_wheel_radius)
+        robot = GaRobot(x, y, ROBOT_SIZE, genome)
         robot.direction = 0
 
         left_obstacle_sensor = ProximitySensor(robot, genome.sensor_delta_direction, genome.sensor_saturation_value,
@@ -60,7 +73,11 @@ class GaEngine:
 
         return robot
 
-    def kill_robot(self, robot):
+    def destroy_robot(self, robot):
+        # save fitness value
+        fitness_value = robot.mileage
+        robot.genome.fitness = fitness_value
+
         self.scene.remove(robot)
         self.population.remove(robot)
-        print('Killed robot', robot)
+        print('Destroyed robot with fitness value', fitness_value)

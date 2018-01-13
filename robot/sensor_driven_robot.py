@@ -21,6 +21,7 @@ class SensorDrivenRobot(DifferentialDriveRobot):
                 self.right_motor_controller.sense_and_act()
                 self.speed_left_wheel = self.left_motor_controller.get_actuator_value()
                 self.speed_right_wheel = self.right_motor_controller.get_actuator_value()
+                self.step()
             except Collision:
                 self.collision_with_object = True
                 self.speed_left_wheel = 0
@@ -29,8 +30,6 @@ class SensorDrivenRobot(DifferentialDriveRobot):
             # a collision has already occured
             self.speed_left_wheel = 0
             self.speed_right_wheel = 0
-
-        self.step()
 
     def set_left_motor_controller(self, left_motor_controller):
         self.left_motor_controller = left_motor_controller

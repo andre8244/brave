@@ -15,6 +15,8 @@ class DifferentialDriveRobot(RotTriangle):
         self.speed_left_wheel = 0.0     # angular velocity of left wheel
         self.speed_right_wheel = 0.0    # angular velocity of left wheel
         self._delta = 0.01
+        self.deltax = None
+        self.deltay = None
 
     def step(self):
         """ updates x, y and direction """
@@ -33,10 +35,12 @@ class DifferentialDriveRobot(RotTriangle):
         print("direction = " + str(self.direction))
 
     def delta_x(self):
-        self.x += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * cos(-self.direction)
+        self.deltax = self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * cos(-self.direction)
+        self.x += self.deltax
 
     def delta_y(self):
-        self.y += self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * sin(-self.direction)
+        self.deltay = self._delta * (self.wheel_radius*0.5) * (self.speed_right_wheel + self.speed_left_wheel) * sin(-self.direction)
+        self.y += self.deltay
 
     def delta_direction(self):
         self.direction += self._delta * (self.wheel_radius/self.length) * (self.speed_right_wheel - self.speed_left_wheel)

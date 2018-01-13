@@ -30,6 +30,7 @@ class Genome:
         self.sensor_delta_direction = sensor_delta_direction
         self.sensor_saturation_value = sensor_saturation_value
         self.sensor_max_distance = sensor_max_distance
+        self.fitness = None
 
     @staticmethod
     def random():
