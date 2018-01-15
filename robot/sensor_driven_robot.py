@@ -2,7 +2,7 @@ import pygame
 
 from robot.differential_drive_robot import DifferentialDriveRobot
 from exception.collision_exception import Collision
-from color import Color
+from geometry.color import Color
 
 
 class SensorDrivenRobot(DifferentialDriveRobot):

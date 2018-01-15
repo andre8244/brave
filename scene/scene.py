@@ -1,10 +1,10 @@
 import time
 import pygame
 
-from point import Point
+from geometry.point import Point
 from scene.wall import Wall
 from scene.box import Box
-from color import Color
+from geometry.color import Color
 
 
 class Scene:

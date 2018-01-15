@@ -1,8 +1,8 @@
 import random
 
 from math import sin, cos, pi
-from rot_triangle import RotTriangle
-from color import Color
+from geometry.rot_triangle import RotTriangle
+from geometry.color import Color
 
 
 class DifferentialDriveRobot(RotTriangle):

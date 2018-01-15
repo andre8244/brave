@@ -5,7 +5,7 @@ import random
 
 from pygame.locals import *
 from robot.sensor_driven_robot import SensorDrivenRobot
-from color import Color
+from geometry.color import Color
 from scene.scene import Scene
 from scene.light import Light
 from sensor.light_sensor import LightSensor

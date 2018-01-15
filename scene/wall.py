@@ -1,7 +1,7 @@
 import pygame
 
 from scene.obstacle import Obstacle
-from color import Color
+from geometry.color import Color
 
 
 class Wall(Obstacle):

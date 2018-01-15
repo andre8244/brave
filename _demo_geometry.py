@@ -3,8 +3,8 @@ import pygame
 import geometry
 
 from pygame.locals import *
-from color import Color
-from point import Point
+from geometry.color import Color
+from geometry.point import Point
 from scene.box import Box
 
 

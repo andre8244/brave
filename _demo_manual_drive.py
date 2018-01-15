@@ -3,8 +3,8 @@ import pygame
 from math import pi
 
 from pygame.locals import *
-from rot_triangle import RotTriangle
-from color import Color
+from geometry.rot_triangle import RotTriangle
+from geometry.color import Color
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 

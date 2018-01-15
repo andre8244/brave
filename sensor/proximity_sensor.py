@@ -1,12 +1,12 @@
 import random
 import pygame
-import geometry
+import geometry.utils
 
 from sensor.sensor import Sensor
 from scene.obstacle import Obstacle
 from math import sin, cos
-from color import Color
-from point import Point
+from geometry.color import Color
+from geometry.point import Point
 from exception.collision_exception import Collision
 
 
@@ -27,7 +27,7 @@ class ProximitySensor(Sensor):
         point_sensor_eol = Point(x_sensor_eol, y_sensor_eol)
 
         sensor_ray = (point_robot, point_sensor_eol)
-        # print("sensor_ray:", geometry.segment_to_string(sensor_ray))
+        # print("sensor_ray:", geometry.utils.segment_to_string(sensor_ray))
         distance_from_nearest_obstacle = None
         nearest_obstacle = None
 
@@ -37,12 +37,12 @@ class ProximitySensor(Sensor):
 
                 # check collision between obstacle edges and sensor ray
                 for obstacle_edge in obstacle.edges:
-                    # print("obstacle_edge:", geometry.segment_to_string(obstacle_edge))
-                    intersection_point = geometry.segments_intersection(sensor_ray, obstacle_edge)
+                    # print("obstacle_edge:", geom_utils.segment_to_string(obstacle_edge))
+                    intersection_point = geometry.utils.segments_intersection(sensor_ray, obstacle_edge)
 
                     if intersection_point is not None:
-                        # print("intersection_point:", geometry.point_to_string(intersection_point))
-                        distance_from_obstacle = geometry.distance(point_robot, intersection_point)
+                        # print("intersection_point:", geom_utils.point_to_string(intersection_point))
+                        distance_from_obstacle = geometry.utils.distance(point_robot, intersection_point)
 
                         if distance_from_nearest_obstacle is None or distance_from_obstacle < distance_from_nearest_obstacle:
                             distance_from_nearest_obstacle = distance_from_obstacle

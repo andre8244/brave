@@ -1,5 +1,5 @@
 import pygame
-from rot_surface import RotSurface
+from geometry.rot_surface import RotSurface
 
 
 class Light(RotSurface):

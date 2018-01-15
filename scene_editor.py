@@ -3,11 +3,11 @@ import pygame
 import random
 
 from pygame.locals import *
-from color import Color
+from geometry.color import Color
 from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall
-from point import Point
+from geometry.point import Point
 from robot.sensor_driven_robot import SensorDrivenRobot
 
 

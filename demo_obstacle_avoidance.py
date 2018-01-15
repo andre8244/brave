@@ -5,14 +5,14 @@ import random
 
 from pygame.locals import *
 from robot.sensor_driven_robot import SensorDrivenRobot
-from color import Color
+from geometry.color import Color
 from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall
 from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
-from point import Point
+from geometry.point import Point
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600

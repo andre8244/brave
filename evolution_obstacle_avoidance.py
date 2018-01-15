@@ -2,7 +2,7 @@ import sys
 import pygame
 
 from pygame.locals import *
-from color import Color
+from geometry.color import Color
 from scene.scene import Scene
 from ga_obstacle_avoidance.ga_engine import GaEngine
 

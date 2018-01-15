@@ -4,7 +4,7 @@ import pygame
 from sensor.sensor import Sensor
 from scene.light import Light
 from math import atan2, sin, cos
-from color import Color
+from geometry.color import Color
 
 
 class LightSensor(Sensor):
