@@ -1,6 +1,6 @@
 import sys
 import pygame
-import geometry
+import geometry.utils
 
 from pygame.locals import *
 from geometry.color import Color
@@ -87,8 +87,8 @@ if __name__ == '__main__':
         pygame.draw.line(screen, Color.GREEN, (a1.x, a1.y), (a2.x, a2.y))
         pygame.draw.line(screen, Color.RED, (b1.x, b1.y), (b2.x, b2.y))
 
-        # intersect = geometry.check_segments_instersect(seg_1, seg_2)
-        intersect = geometry.segments_intersection(seg_1, seg_2)
+        # intersect = geometry.utils.check_segments_instersect(seg_1, seg_2)
+        intersect = geometry.utils.segments_intersection(seg_1, seg_2)
         print("intersect:", intersect)
 
         if intersect is not None:

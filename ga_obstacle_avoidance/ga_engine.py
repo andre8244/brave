@@ -18,7 +18,6 @@ OBSTACLE_SENSOR_ERROR = 0.1
 
 class GaEngine:
 
-    # todo keep genomes in a list?
     # todo keep last genomes in a variable (for save to file feature)
 
     def __init__(self, scene, initial_population):
