@@ -5,10 +5,12 @@ from pygame.locals import *
 from geometry.color import Color
 from scene.scene import Scene
 from ga_obstacle_avoidance.ga_engine import GaEngine
+from robot.sensor_driven_robot import SensorDrivenRobot
 
 
-SCENE_SPEED_INITIAL = 1000
-POPULATION_NUM = 25
+SCENE_MAX_SPEED = 2000
+SCENE_SPEED_INITIAL = 2000
+POPULATION_NUM = 500
 
 scene = None
 screen = None
@@ -27,7 +29,7 @@ def initialize():
 def increase_scene_speed():
     global scene
 
-    if scene.speed < 1000:
+    if scene.speed < SCENE_MAX_SPEED:
         scene.speed *= 1.5
     print('scene.speed:', scene.speed)
 
@@ -70,6 +72,9 @@ if __name__ == '__main__':
 
         for obj in scene.objects:
             obj.draw(screen)
+
+            if issubclass(type(obj), SensorDrivenRobot) and obj.label is not None:
+                obj.draw_label(screen)
 
         pygame.display.flip()
         int_scene_speed = int(round(scene.speed))

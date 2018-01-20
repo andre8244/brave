@@ -1,4 +1,3 @@
-import sys
 import random
 
 from ga_obstacle_avoidance.ga_robot import GaRobot
@@ -9,9 +8,11 @@ from ga_obstacle_avoidance.genome import Genome
 
 
 ROBOT_SIZE = 25
-OBSTACLE_SENSOR_ERROR = 0.1
+OBSTACLE_SENSOR_ERROR = 0
 ELITISM_NUM = 3
-SELECTION_PERCENTAGE = 30  # 0 < SELECTION_PERCENTAGE < 100
+SELECTION_PERCENTAGE = 0.3  # 0 < SELECTION_PERCENTAGE < 1
+MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
+MUTATION_COEFFICIENT = 0.07  # 0.07
 
 # OBSTACLE_SENSOR_MAX_DISTANCE = 100
 # OBSTACLE_SENSOR_SATURATION_VALUE = 50
@@ -23,24 +24,28 @@ SELECTION_PERCENTAGE = 30  # 0 < SELECTION_PERCENTAGE < 100
 
 class GaEngine:
 
-    # todo keep last genomes in a variable (for save to file feature)
-
     def __init__(self, scene, population_num):
+        if population_num <= ELITISM_NUM:
+            raise ValueError('Error: population_num (' + str(population_num) + ') must be greater than ELITISM_NUM (' + str(
+                ELITISM_NUM) + ')')
+
         self.scene = scene
         self.population_num = population_num
         self.robots = []
         self.genomes = []
         self.genomes_last_generation = []
+        self.best_genome = None
         self.generation_num = 1
 
         for i in range(self.population_num):
-            x = scene.width / 2
-            y = scene.height / 2
+            x, y = self.robot_start_position()
             genome = Genome.random(self.generation_num)
             self.genomes.append(genome)
-            robot = self.build_robot(x, y, genome)
+            robot = self.build_robot(x, y, genome, None)
             scene.put(robot)
             self.robots.append(robot)
+
+        print("Generation", self.generation_num)
 
     def step(self):
         for robot in self.robots:
@@ -59,9 +64,10 @@ class GaEngine:
                 print('Generation', self.generation_num, 'terminated')
                 self.create_new_generation()
 
-    def build_robot(self, x, y, genome):
+    def build_robot(self, x, y, genome, label):
         robot = GaRobot(x, y, ROBOT_SIZE, genome)
         robot.direction = 0
+        robot.label = label
 
         left_obstacle_sensor = ProximitySensor(robot, genome.sensor_delta_direction, genome.sensor_saturation_value,
                                                OBSTACLE_SENSOR_ERROR, genome.sensor_max_distance, self.scene)
@@ -86,25 +92,48 @@ class GaEngine:
 
         self.scene.remove(robot)
         self.robots.remove(robot)
-        print('Destroyed robot with fitness value', fitness_value)
+        # print('Destroyed robot with fitness value', fitness_value)
 
     def create_new_generation(self):
         self.genomes_last_generation = self.genomes
+        genomes_selected = self.ga_selection()  # parents of the new generation
+        # print("\ngenomes selected", genomes_selected)
+        self.generation_num += 1
+        new_genomes = self.ga_crossover_mutation(genomes_selected)
+        self.genomes = new_genomes
 
-        # parents of the new generation
-        genomes_selected = self.ga_selection()
-        print("\ngenomes selected", genomes_selected)
+        # draw a label for the elite individuals
+        elite_label = 1
 
-        new_genomes = self.ga_crossover(genomes_selected)
+        for genome in self.genomes:
+            if elite_label <= ELITISM_NUM:
+                label = elite_label
+                elite_label += 1
+            else:
+                label = None
 
-        sys.exit()
+            x, y = self.robot_start_position()
+            robot = self.build_robot(x, y, genome, label)
+            self.scene.put(robot)
+            self.robots.append(robot)
+
+        print("\nGeneration", self.generation_num)
 
     def ga_selection(self):
         # sort genomes by fitness
-        print('\nbefore:', str(self.genomes))  # todo del
         sorted_genomes = sorted(self.genomes, key=lambda genome: genome.fitness, reverse=True)
-        print('\nafter:', str(sorted_genomes))  # todo del
-        num_genomes_to_select = round(self.population_num * SELECTION_PERCENTAGE / 100)
+        best_genome_current_generation = sorted_genomes[0]
+
+        if self.best_genome is None or best_genome_current_generation.fitness > self.best_genome.fitness:
+
+            # if self.best_genome is not None:  # todo del
+            #    print("      ###  " + str(best_genome_current_generation.fitness) + ' > ' + str(self.best_genome.fitness))
+
+            self.best_genome = best_genome_current_generation
+            print('Best genome found:', self.best_genome.to_string())
+
+        # print('\nsorted_genomes:', str(sorted_genomes))  # todo del
+        num_genomes_to_select = round(self.population_num * SELECTION_PERCENTAGE)
         genomes_selected = []
 
         # elitism: keep the best genomes in the new generation
@@ -113,17 +142,16 @@ class GaEngine:
             # elite_genome.elite = True todo delete
             genomes_selected.append(elite_genome)
             num_genomes_to_select -= 1
-            print("elite selected", elite_genome)
+            print("Elite genome", elite_genome.to_string())
 
         while num_genomes_to_select > 0:
             genome_selected = self.roulette_select(sorted_genomes)
-            print("genome selected", genome_selected)
+            # print("genome selected", genome_selected)
             genomes_selected.append(genome_selected)
             sorted_genomes.remove(genome_selected)
             num_genomes_to_select -= 1
 
         return genomes_selected
-
 
     def roulette_select(self, genomes):
         fitness_sum = 0
@@ -141,19 +169,27 @@ class GaEngine:
 
         return genomes[-1]
 
-    def ga_crossover(self, parents):
+    def ga_crossover_mutation(self, parents):
         num_genomes_to_create = self.population_num
         new_genomes = []
 
         # elitism: keep the best genomes in the new generation
         for i in range(ELITISM_NUM):
             new_genomes.append(parents[i])
+            # print('ga_crossover: elite parents ', new_genomes) # todo del
             num_genomes_to_create -= 1
 
         while num_genomes_to_create > 0:
             parent_a, parent_b = self.choose_parents(parents)
-            print('\nparents chosen', parent_a, parent_b)
-            # todo
+            # print('\nparents chosen', parent_a, parent_b)
+            new_genome = parent_a.crossover(parent_b, self.generation_num)
+            new_genome.mutation(MUTATION_PROBABILITY, MUTATION_COEFFICIENT)
+            new_genomes.append(new_genome)
+            num_genomes_to_create -= 1
+            # print('\nnew_genome', new_genome.to_string())
+
+        # print('   @@@ ga_crossover: new_genomes', new_genomes) # todo del
+        return new_genomes
 
     def choose_parents(self, parents):
         pos_a = random.randrange(len(parents))
@@ -163,3 +199,8 @@ class GaEngine:
         parent_b = parents[pos_b]
         parents.insert(pos_a, parent_a)  # reinsert the first parent in the list
         return parent_a, parent_b
+
+    def robot_start_position(self):
+        x = self.scene.width / 2
+        y = self.scene.height / 2
+        return x, y
