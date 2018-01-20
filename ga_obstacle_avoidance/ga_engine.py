@@ -45,7 +45,7 @@ class GaEngine:
             scene.put(robot)
             self.robots.append(robot)
 
-        print("Generation", self.generation_num)
+        print('\nGeneration', self.generation_num, 'started')
 
     def step(self):
         for robot in self.robots:
@@ -117,7 +117,7 @@ class GaEngine:
             self.scene.put(robot)
             self.robots.append(robot)
 
-        print("\nGeneration", self.generation_num)
+        print('\nGeneration', self.generation_num, 'started')
 
     def ga_selection(self):
         # sort genomes by fitness
@@ -130,7 +130,7 @@ class GaEngine:
             #    print("      ###  " + str(best_genome_current_generation.fitness) + ' > ' + str(self.best_genome.fitness))
 
             self.best_genome = best_genome_current_generation
-            print('Best genome found:', self.best_genome.to_string())
+            print('New best:', self.best_genome.to_string())
 
         # print('\nsorted_genomes:', str(sorted_genomes))  # todo del
         num_genomes_to_select = round(self.population_num * SELECTION_PERCENTAGE)
@@ -142,7 +142,7 @@ class GaEngine:
             # elite_genome.elite = True todo delete
             genomes_selected.append(elite_genome)
             num_genomes_to_select -= 1
-            print("Elite genome", elite_genome.to_string())
+            print("Elite:", elite_genome.to_string())
 
         while num_genomes_to_select > 0:
             genome_selected = self.roulette_select(sorted_genomes)

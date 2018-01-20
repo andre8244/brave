@@ -12,7 +12,7 @@ from exception.collision_exception import Collision
 
 class ProximitySensor(Sensor):
 
-    COLLISION_DISTANCE = 8  # px
+    COLLISION_DISTANCE = 12  # px
 
     def __init__(self, robot, delta_direction, saturation_value, error, max_distance, scene):
         super().__init__(robot, delta_direction, saturation_value, error, scene)

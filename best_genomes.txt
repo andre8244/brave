@@ -1,0 +1,1 @@
+Genome(fitness:13250.83 generation_num:17 robot_wheel_radius:9.73 motor_ctrl_coefficient:600 motor_ctrl_min_actuator_value:10 sensor_delta_direction:0.59 sensor_saturation_value:21.34 sensor_max_distance:70.67)
