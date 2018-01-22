@@ -14,9 +14,7 @@ from robot.motor_controller import MotorController
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
-
 ROBOT_SIZE = 30
-ROBOT_WHEEL_SPEED_DELTA = 3
 
 LIGHT_SENSOR_SATURATION_VALUE = 100
 LIGHT_SENSOR_ERROR = 0.1
@@ -28,7 +26,7 @@ SCREEN_MARGIN = ROBOT_SIZE / 2
 
 SCENE_SPEED_INITIAL = 25
 
-N_ROBOTS = 10
+N_ROBOTS = 5
 N_LIGHTS = 5
 
 PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
@@ -49,7 +47,7 @@ def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
     left_wheel_actuator = Actuator()
     right_wheel_actuator = Actuator()
 
-    if (PHOTOTAXIS):
+    if PHOTOTAXIS:
         left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
                                                 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
         right_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,

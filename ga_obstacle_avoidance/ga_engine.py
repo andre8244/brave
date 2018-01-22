@@ -9,17 +9,10 @@ from ga_obstacle_avoidance.genome import Genome
 
 ROBOT_SIZE = 25
 OBSTACLE_SENSOR_ERROR = 0
-ELITISM_NUM = 5
+ELITISM_NUM = 3
 SELECTION_PERCENTAGE = 0.3  # 0 < SELECTION_PERCENTAGE < 1
 MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
-MUTATION_COEFFICIENT = 0.07  # 0.07
-
-# OBSTACLE_SENSOR_MAX_DISTANCE = 100
-# OBSTACLE_SENSOR_SATURATION_VALUE = 50
-# MOTOR_CONTROLLER_COEFFICIENT = 300
-# MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
-# WHEEL_RADIUS = 10
-# SENSOR_DIRECTION = math.pi / 8
+MUTATION_COEFFICIENT = 0.07
 
 
 class GaEngine:
@@ -125,28 +118,21 @@ class GaEngine:
         best_genome_current_generation = sorted_genomes[0]
 
         if self.best_genome is None or best_genome_current_generation.fitness > self.best_genome.fitness:
-
-            # if self.best_genome is not None:  # todo del
-            #    print("      ###  " + str(best_genome_current_generation.fitness) + ' > ' + str(self.best_genome.fitness))
-
             self.best_genome = best_genome_current_generation
             print('New best:', self.best_genome.to_string())
 
-        # print('\nsorted_genomes:', str(sorted_genomes))  # todo del
         num_genomes_to_select = round(self.population_num * SELECTION_PERCENTAGE)
         genomes_selected = []
 
         # elitism: keep the best genomes in the new generation
         for i in range(ELITISM_NUM):
             elite_genome = sorted_genomes.pop(0)
-            # elite_genome.elite = True todo delete
             genomes_selected.append(elite_genome)
             num_genomes_to_select -= 1
             print("Elite:", elite_genome.to_string())
 
         while num_genomes_to_select > 0:
             genome_selected = self.roulette_select(sorted_genomes)
-            # print("genome selected", genome_selected)
             genomes_selected.append(genome_selected)
             sorted_genomes.remove(genome_selected)
             num_genomes_to_select -= 1
@@ -176,19 +162,15 @@ class GaEngine:
         # elitism: keep the best genomes in the new generation
         for i in range(ELITISM_NUM):
             new_genomes.append(parents[i])
-            # print('ga_crossover: elite parents ', new_genomes) # todo del
             num_genomes_to_create -= 1
 
         while num_genomes_to_create > 0:
             parent_a, parent_b = self.choose_parents(parents)
-            # print('\nparents chosen', parent_a, parent_b)
             new_genome = parent_a.crossover(parent_b, self.generation_num)
             new_genome.mutation(MUTATION_PROBABILITY, MUTATION_COEFFICIENT)
             new_genomes.append(new_genome)
             num_genomes_to_create -= 1
-            # print('\nnew_genome', new_genome.to_string())
 
-        # print('   @@@ ga_crossover: new_genomes', new_genomes) # todo del
         return new_genomes
 
     def choose_parents(self, parents):

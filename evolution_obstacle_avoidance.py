@@ -9,7 +9,7 @@ from ga_obstacle_avoidance.ga_engine import GaEngine
 from robot.sensor_driven_robot import SensorDrivenRobot
 
 
-POPULATION_NUM = 30
+POPULATION_NUM = 100
 SCENE_MAX_SPEED = 2000
 SCENE_SPEED_INITIAL = 2000
 

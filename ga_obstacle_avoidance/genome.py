@@ -59,15 +59,10 @@ class Genome:
             other_parent.sensor_saturation_value
         sensor_max_distance = self.sensor_max_distance if random.random() < 0.5 else other_parent.sensor_max_distance
 
-        # print('\nparent_a', self.to_string())
-        # print('\nparent_b', parent_b.to_string())
-
         return Genome(generation_num, robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
                       sensor_delta_direction, sensor_saturation_value, sensor_max_distance)
 
     def mutation(self, mutation_probability, mutation_coefficient):
-        # print('\nbefore mutation', self.to_string())
-
         self.robot_wheel_radius = self.mutate_with_probability(self.robot_wheel_radius, mutation_probability,
                                                                mutation_coefficient)
         self.motor_ctrl_coefficient = self.mutate_with_probability(self.motor_ctrl_coefficient, mutation_probability,
@@ -81,12 +76,10 @@ class Genome:
         self.sensor_max_distance = self.mutate_with_probability(self.sensor_max_distance, mutation_probability,
                                                                 mutation_coefficient)
         self.check_parameter_bounds()
-        # print('\nafter mutation', self.to_string())
 
     def mutate_with_probability(self, value, mutation_probability, mutation_coefficient):
         if random.random() < mutation_probability:
             percentage_std_dev = mutation_coefficient * value
-            # return random.gauss(value, mutation_coefficient)  # todo del
             return random.gauss(value, percentage_std_dev)
         else:
             return value

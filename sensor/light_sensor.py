@@ -33,13 +33,8 @@ class LightSensor(Sensor):
 
                 dir_light = atan2(y_light, x_light)
                 difference_dir = dir_sensor - dir_light
-
                 angle_sensor_light = atan2(sin(difference_dir), cos(difference_dir))
-
-                # TODO CONSIDER ROBOT-LIGHT DISTANCE?
-
                 value = cos(angle_sensor_light) * light.emitting_power
-                # print('light:', light, 'value:', value)
 
                 if value > 0:
                     total_value += value

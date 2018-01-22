@@ -48,10 +48,6 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         # call super method to draw the robot
         super().draw(screen)
 
-    # todo delete
-    # def get_saved_scene_repr(self):
-    #     return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y)
-
     def draw_label(self, screen):
         if pygame.font:
             font = pygame.font.Font(None, 26)
