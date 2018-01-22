@@ -52,9 +52,6 @@ class SensorDrivenRobot(DifferentialDriveRobot):
     # def get_saved_scene_repr(self):
     #     return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y)
 
-    def set_label(self, label):
-        self.label = label
-
     def draw_label(self, screen):
         if pygame.font:
             font = pygame.font.Font(None, 26)

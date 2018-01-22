@@ -48,14 +48,14 @@ def init_scene():
                 x = float(words[1])
                 y = float(words[2])
                 robot = SensorDrivenRobot(x, y, ROBOT_SIZE, ROBOT_WHEEL_RADIUS)
-                robot.set_label(line_number)
+                robot.label = line_number
                 scene.put(robot)
             elif words[0] == 'Box':
                 x = int(words[1])
                 y = int(words[2])
                 size = int(words[3])
                 box = Box(x, y, size, Color.random_bright())
-                box.set_label(line_number)
+                box.label = line_number
                 scene.put(box)
             elif words[0] == 'Wall':
                 x1 = int(words[1])
@@ -66,7 +66,7 @@ def init_scene():
                 point1 = Point(x1, y1)
                 point2 = Point(x2, y2)
                 wall = Wall(point1, point2, Color.random_bright())
-                wall.set_label(line_number)
+                wall.label = line_number
                 scene.put(wall)
 
             line_number += 1
@@ -84,7 +84,7 @@ def add_box_to_cursor():
     x, y = pygame.mouse.get_pos()
     size = random.randint(20, 60)
     box = Box(x, y, size, Color.random_bright())
-    box.set_label(label)
+    box.label = label
     label += 1
     boxes_added.append(box)
     scene.put(box)

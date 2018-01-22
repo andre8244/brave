@@ -19,9 +19,6 @@ class Wall(Obstacle):
         return self.__class__.__name__ + ' ' + str(self.point1.x) + ' ' + str(self.point1.y) \
                + ' ' + str(self.point2.x) + ' ' + str(self.point2.y)
 
-    def set_label(self, label):
-        self.label = label
-
     def draw_label(self, screen):
         if pygame.font:
             font = pygame.font.Font(None, 26)

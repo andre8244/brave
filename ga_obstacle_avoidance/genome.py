@@ -124,7 +124,7 @@ class Genome:
 
     def __repr__(self):
         fitness_value = None if self.fitness is None else round(self.fitness, 2)
-        return self.__class__.__name__ + '(fit:' + repr(fitness_value) + ' gen:' + repr(
+        return self.__class__.__name__ + '(fitness:' + repr(fitness_value) + ' generation_num:' + repr(
             self.generation_num) + ')'
 
     def to_string(self):
