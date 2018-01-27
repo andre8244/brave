@@ -7,11 +7,12 @@ from geometry.color import Color
 from scene.scene import Scene
 from ga_obstacle_avoidance.ga_engine import GaEngine
 from robot.sensor_driven_robot import SensorDrivenRobot
+from time_util import TimeUtil
 
 
-POPULATION_NUM = 100
+POPULATION_NUM = 300
 SCENE_MAX_SPEED = 2000
-SCENE_SPEED_INITIAL = 2000
+SCENE_SPEED_INITIAL = 2000  # 2000
 
 scene = None
 screen = None
@@ -128,7 +129,12 @@ if __name__ == '__main__':
             # elif event.type == KEYDOWN and event.key == K_s:
             #     scene.save()
 
+        start_time = TimeUtil.current_time_millis()
         engine.step()
+        end_time = TimeUtil.current_time_millis()
+        step_duration = end_time - start_time
+        print('total step duration', step_duration)
+
         screen.fill(Color.BLACK)
 
         for obj in scene.objects:

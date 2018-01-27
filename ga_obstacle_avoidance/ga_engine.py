@@ -1,11 +1,17 @@
 import random
+import multiprocessing
+import math
 
 from ga_obstacle_avoidance.ga_robot import GaRobot
+from ga_obstacle_avoidance.thread_ga_robot import ThreadGaRobot
 from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 from ga_obstacle_avoidance.genome import Genome
+from time_util import TimeUtil
 
+
+MULTITHREADING = False
 
 ROBOT_SIZE = 25
 OBSTACLE_SENSOR_ERROR = 0
@@ -29,6 +35,7 @@ class GaEngine:
         self.genomes_last_generation = []
         self.best_genome = None
         self.generation_num = 1
+        self.num_cpu = multiprocessing.cpu_count()
 
         for i in range(self.population_num):
             x, y = self.robot_start_position()
@@ -39,23 +46,78 @@ class GaEngine:
             self.robots.append(robot)
 
         print('\nGeneration', self.generation_num, 'started')
+        print('multithreading', MULTITHREADING)
 
     def step(self):
-        for robot in self.robots:
-            robot.sense_and_act()
+        start_time = TimeUtil.current_time_millis()
 
-            # ensure robot doesn't accidentaly go outside of the scene
-            if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
-                self.destroy_robot(robot)
+        if MULTITHREADING:
+            threads = []
 
-            # destroy robot if it collides an obstacle
-            if robot.collision_with_object:
-                self.destroy_robot(robot)
+            # print('')
 
-            # check population extinction
-            if not self.robots:
-                print('Generation', self.generation_num, 'terminated')
-                self.create_new_generation()
+            num_robots = len(self.robots)
+            num_robots_per_cpu = math.floor(num_robots / self.num_cpu)
+
+            # print('num_robots_per_cpu', num_robots_per_cpu)
+
+            for i in range(self.num_cpu - 1):
+                start_pos = i * num_robots_per_cpu
+                end_pos = (i + 1) * num_robots_per_cpu
+                # print('core', str(i+1), 'positions', start_pos, ':', end_pos)
+                robot_list = self.robots[start_pos:end_pos]
+
+                thread = ThreadGaRobot(robot_list)
+                thread.start()
+                # print('thread', str(i+1), 'started')
+                threads.append(thread)
+
+            # last sublist of robots
+            start_pos = (self.num_cpu - 1) * num_robots_per_cpu
+            # print('last core, start_pos', start_pos)
+            robot_list = self.robots[start_pos:]
+
+            thread = ThreadGaRobot(robot_list)
+            thread.start()
+            # print('last thread started')
+            threads.append(thread)
+
+            for t in threads:
+                t.join()
+
+            end_time = TimeUtil.current_time_millis()
+            partial_duration = end_time - start_time
+            print('   partial duration', partial_duration)
+
+            for robot in self.robots:
+                # ensure robot doesn't accidentaly go outside of the scene
+                if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
+                    self.destroy_robot(robot)
+
+                # destroy robot if it collides an obstacle
+                if robot.collision_with_object:
+                    self.destroy_robot(robot)
+        else:
+            # MULTITHREADING = False
+            for robot in self.robots:
+                robot.sense_and_act()
+
+                # thread = ThreadGaRobot(robot)
+                # thread.start()
+                # threads.append(thread)
+
+                # ensure robot doesn't accidentaly go outside of the scene
+                if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
+                    self.destroy_robot(robot)
+
+                # destroy robot if it collides an obstacle
+                if robot.collision_with_object:
+                    self.destroy_robot(robot)
+
+        # check population extinction
+        if not self.robots:
+            print('Generation', self.generation_num, 'terminated')
+            self.create_new_generation()
 
     def build_robot(self, x, y, genome, label):
         robot = GaRobot(x, y, ROBOT_SIZE, genome)
