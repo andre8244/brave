@@ -1,6 +1,7 @@
 import sys
 import pygame
 import math
+import argparse
 
 from pygame.locals import *
 from geometry.color import Color
@@ -10,10 +11,16 @@ from robot.sensor_driven_robot import SensorDrivenRobot
 from time_util import TimeUtil
 
 
-POPULATION_NUM = 300
+DEFAULT_SCENE_PATH = 'saved_scenes/scene_training_obstacle_avoidance.txt'
+DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
 SCENE_MAX_SPEED = 2000
-SCENE_SPEED_INITIAL = 2000  # 2000
+STATISTICS_PANEL_WIDTH = 500
 
+population_num = None
+scene_speed = None
+scene_path = None
+elitism_num = None
+robot_random_direction = None
 scene = None
 screen = None
 engine = None
@@ -23,16 +30,21 @@ def initialize():
     global scene
     global screen
     global engine
+    global population_num
+    global scene_speed
+    global elitism_num
+    global scene_path
+    global robot_random_direction
 
-    scene, screen = Scene.load_from_file('saved_scenes/scene_training_obstacle_avoidance.txt', SCENE_SPEED_INITIAL)
+    scene, screen = Scene.load_from_file(scene_path, scene_speed)
 
     # redefine pygame screen in order to display statistics
-    screen_width = scene.width + 500
+    screen_width = scene.width + STATISTICS_PANEL_WIDTH
     screen_height = scene.height
     screen = pygame.display.set_mode((screen_width, screen_height))
     scene.screen = screen
 
-    engine = GaEngine(scene, POPULATION_NUM)
+    engine = GaEngine(scene, population_num, elitism_num, robot_random_direction)
 
 
 def increase_scene_speed():
@@ -111,7 +123,41 @@ def show_statistics():
             screen.blit(line10, line10_pos)
 
 
+def parse_cli_arguments():
+    global population_num
+    global scene_speed
+    global elitism_num
+    global scene_path
+    global DEFAULT_SCENE_SPEED
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--pop', help='Population (number of robots in each generation). Default: ' +
+                                      str(GaEngine.DEFAULT_POPULATION_NUM), type=int)
+    parser.add_argument('--fps', help='Number of fps (0 = maximum fps). Default: ' + str(DEFAULT_SCENE_SPEED), type=int)
+    parser.add_argument('--elite', help='Number of elite robots. Default: ' +
+                                        str(GaEngine.DEFAULT_ELITISM_NUM), type=int)
+    parser.add_argument('--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH)
+    args = parser.parse_args()
+
+    elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite
+    population_num = GaEngine.DEFAULT_POPULATION_NUM if args.pop is None else args.pop
+    scene_speed = DEFAULT_SCENE_SPEED if args.fps is None else args.fps
+    scene_path = DEFAULT_SCENE_PATH if args.scene is None else args.scene
+
+    # check parameters value
+    if elitism_num < 0:
+        raise ValueError('Error: elite argument must be >= 0')
+
+    if population_num <= elitism_num:
+        raise ValueError('Error: pop argument value must be > elite argument value')
+
+    if scene_speed < 0:
+        raise ValueError('Error: fps argument must be >= 0')
+
+
 if __name__ == '__main__':
+    parse_cli_arguments()
     pygame.init()
     clock = pygame.time.Clock()
     initialize()
@@ -129,11 +175,11 @@ if __name__ == '__main__':
             # elif event.type == KEYDOWN and event.key == K_s:
             #     scene.save()
 
-        start_time = TimeUtil.current_time_millis()
+        # start_time = TimeUtil.current_time_millis()
         engine.step()
-        end_time = TimeUtil.current_time_millis()
-        step_duration = end_time - start_time
-        print('total step duration', step_duration)
+        # end_time = TimeUtil.current_time_millis()
+        # step_duration = end_time - start_time
+        # print('total step duration', step_duration)
 
         screen.fill(Color.BLACK)
 
