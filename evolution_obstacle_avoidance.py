@@ -137,19 +137,21 @@ def parse_cli_arguments():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--pop', help='Number of vehicles in each generation. Default: ' +
+    parser.add_argument('-p', '--population', help='Number of vehicles in each generation. Default: ' +
                                       str(GaEngine.DEFAULT_POPULATION_NUM), type=int, metavar='POPULATION_NUM')
-    parser.add_argument('--elite', help='Number of vehicles carried over unaltered to a new generation. Default: ' +
-                                        str(GaEngine.DEFAULT_ELITISM_NUM), type=int, metavar='ELITISM_NUM')
-    parser.add_argument('--randdir', help='Set an initial random direction to every vehicle', action="store_true")
-    parser.add_argument('--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH, metavar='SCENE_FILE')
-    parser.add_argument('--fps',
+    parser.add_argument('-e', '--elite',
+                        help='Number of vehicles carried over unaltered to a new generation. Default: ' + str(
+                            GaEngine.DEFAULT_ELITISM_NUM), type=int, metavar='ELITISM_NUM')
+    parser.add_argument('-r', '--randdir', help='Set an initial random direction to every vehicle', action="store_true")
+    parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
+                        metavar='SCENE_FILE')
+    parser.add_argument('-f', '--fps',
                         help='Number of frames per second (0 = maximum fps). Default: ' + str(DEFAULT_SCENE_SPEED),
                         type=int, metavar='FPS_NUM')
     args = parser.parse_args()
 
     elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite
-    population_num = GaEngine.DEFAULT_POPULATION_NUM if args.pop is None else args.pop
+    population_num = GaEngine.DEFAULT_POPULATION_NUM if args.population is None else args.population
     robot_random_direction = args.randdir
     scene_speed = DEFAULT_SCENE_SPEED if args.fps is None else args.fps
     scene_path = DEFAULT_SCENE_PATH if args.scene is None else args.scene
