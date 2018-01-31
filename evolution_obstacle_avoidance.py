@@ -13,7 +13,7 @@ from time_util import TimeUtil
 
 DEFAULT_SCENE_PATH = 'saved_scenes/scene_training_obstacle_avoidance.txt'
 DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
-SCENE_MAX_SPEED = 2000
+SCENE_MAX_SPEED = 3000
 STATISTICS_PANEL_WIDTH = 500
 
 population_num = None
@@ -57,6 +57,9 @@ def increase_scene_speed():
 
 def decrease_scene_speed():
     global scene
+
+    if scene.speed == 0:
+        scene.speed = SCENE_MAX_SPEED
 
     if scene.speed > 1:
         scene.speed /= 1.5
@@ -128,20 +131,26 @@ def parse_cli_arguments():
     global scene_speed
     global elitism_num
     global scene_path
+    global robot_random_direction
     global DEFAULT_SCENE_SPEED
+    global DEFAULT_SCENE_PATH
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--pop', help='Population (number of robots in each generation). Default: ' +
-                                      str(GaEngine.DEFAULT_POPULATION_NUM), type=int)
-    parser.add_argument('--fps', help='Number of fps (0 = maximum fps). Default: ' + str(DEFAULT_SCENE_SPEED), type=int)
-    parser.add_argument('--elite', help='Number of elite robots. Default: ' +
-                                        str(GaEngine.DEFAULT_ELITISM_NUM), type=int)
-    parser.add_argument('--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH)
+    parser.add_argument('--pop', help='Number of vehicles in each generation. Default: ' +
+                                      str(GaEngine.DEFAULT_POPULATION_NUM), type=int, metavar='POPULATION_NUM')
+    parser.add_argument('--elite', help='Number of vehicles carried over unaltered to a new generation. Default: ' +
+                                        str(GaEngine.DEFAULT_ELITISM_NUM), type=int, metavar='ELITISM_NUM')
+    parser.add_argument('--randdir', help='Set an initial random direction to every vehicle', action="store_true")
+    parser.add_argument('--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH, metavar='SCENE_FILE')
+    parser.add_argument('--fps',
+                        help='Number of frames per second (0 = maximum fps). Default: ' + str(DEFAULT_SCENE_SPEED),
+                        type=int, metavar='FPS_NUM')
     args = parser.parse_args()
 
     elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite
     population_num = GaEngine.DEFAULT_POPULATION_NUM if args.pop is None else args.pop
+    robot_random_direction = args.randdir
     scene_speed = DEFAULT_SCENE_SPEED if args.fps is None else args.fps
     scene_path = DEFAULT_SCENE_PATH if args.scene is None else args.scene
 
