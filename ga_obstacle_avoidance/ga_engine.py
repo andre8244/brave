@@ -22,13 +22,14 @@ class GaEngine:
     MUTATION_COEFFICIENT = 0.07
     MULTITHREADING = False
 
-    def __init__(self, scene, population_num, elitism_num, robot_random_direction=False):
+    def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction=False):
         if population_num <= elitism_num:
             raise ValueError(
                 'Error: population_num (' + str(population_num) + ') must be greater than elitism_num (' + str(
                     elitism_num) + ')')
 
         self.scene = scene
+        self.statistics = statistics
         self.population_num = population_num
         self.elitism_num = elitism_num
         self.robot_random_direction = robot_random_direction
@@ -47,6 +48,7 @@ class GaEngine:
             scene.put(robot)
             self.robots.append(robot)
 
+        self.statistics.update(self.generation_num, None, None)
         print('\nGeneration', self.generation_num, 'started')
         print('multithreading', self.MULTITHREADING)
 
@@ -120,6 +122,7 @@ class GaEngine:
         if not self.robots:
             print('Generation', self.generation_num, 'terminated')
             self.create_new_generation()
+            self.statistics.update(self.generation_num, self.best_genome, self.best_genome.fitness)
 
     def build_robot(self, x, y, genome, label):
         robot = GaRobot(x, y, self.ROBOT_SIZE, genome)
