@@ -46,7 +46,7 @@ class Scene:
         return self.__class__.__name__ + ' ' + str(self.width) + ' ' + str(self.height)
 
     @staticmethod
-    def load_from_file(file_path, scene_speed):
+    def load_from_file(file_path, scene_speed, statistics_panel_width):
         with open(file_path) as f:
             line_number = 1
 
@@ -56,7 +56,7 @@ class Scene:
                 if words[0] == 'Scene':
                     width = int(words[1])
                     height = int(words[2])
-                    screen = pygame.display.set_mode((width, height))
+                    screen = pygame.display.set_mode((width + statistics_panel_width, height))
                     scene = Scene(width, height, scene_speed, screen)
                 # elif words[0] == 'SensorDrivenRobot':
                 #     x = float(words[1])

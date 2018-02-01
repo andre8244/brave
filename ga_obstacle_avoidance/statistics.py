@@ -58,7 +58,8 @@ class Statistics:
 
                 line8 = font.render(
                     '     Sensor direction: ' + str(
-                        round(math.degrees(self.best_genome.sensor_delta_direction), 2)) + '°', 1, Color.WHITE)
+                        round(math.degrees(self.best_genome.sensor_delta_direction), 2)) + ' deg (' + str(
+                        round(self.best_genome.sensor_delta_direction, 2)) + ' rad)', 1, Color.WHITE)
                 line8_pos = pygame.Rect(self.scene.width + 50, 550, 20, 20)
                 self.screen.blit(line8, line8_pos)
 

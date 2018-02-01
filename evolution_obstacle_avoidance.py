@@ -13,7 +13,7 @@ from robot.sensor_driven_robot import SensorDrivenRobot
 from time_util import TimeUtil
 
 
-DEFAULT_SCENE_PATH = 'saved_scenes/scene_training_obstacle_avoidance.txt'
+DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
 DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
 SCENE_MAX_SPEED = 3000
 STATISTICS_PANEL_WIDTH = 500
@@ -40,13 +40,13 @@ def initialize():
     global robot_random_direction
     global statistics
 
-    scene, screen = Scene.load_from_file(scene_path, scene_speed)
+    scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
 
     # redefine pygame screen in order to display statistics
-    screen_width = scene.width + STATISTICS_PANEL_WIDTH
-    screen_height = scene.height
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    scene.screen = screen
+    # screen_width = scene.width + STATISTICS_PANEL_WIDTH
+    # screen_height = scene.height
+    # screen = pygame.display.set_mode((screen_width, screen_height))
+    # scene.screen = screen
 
     statistics = Statistics(scene, screen)
     engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction)
