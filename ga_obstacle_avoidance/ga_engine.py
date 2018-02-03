@@ -13,16 +13,16 @@ from time_util import TimeUtil
 
 class GaEngine:
 
+    ROBOT_SIZE = 25
     DEFAULT_POPULATION_NUM = 500
     DEFAULT_ELITISM_NUM = 3
-    ROBOT_SIZE = 25
-    OBSTACLE_SENSOR_ERROR = 0
+    DEFAULT_OBSTACLE_SENSOR_ERROR = 0
+    DEFAULT_MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
+    DEFAULT_MUTATION_COEFFICIENT = 0.07
     SELECTION_PERCENTAGE = 0.3  # 0 < SELECTION_PERCENTAGE < 1
-    MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
-    MUTATION_COEFFICIENT = 0.07
-    MULTITHREADING = False
 
-    def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction=False):
+    def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
+                 obstacle_sensor_error, mutation_probability, mutation_coefficient):
         if population_num <= elitism_num:
             raise ValueError(
                 'Error: population_num (' + str(population_num) + ') must be greater than elitism_num (' + str(
@@ -33,6 +33,10 @@ class GaEngine:
         self.population_num = population_num
         self.elitism_num = elitism_num
         self.robot_random_direction = robot_random_direction
+        self.multicore = multicore
+        self.obstacle_sensor_error = obstacle_sensor_error
+        self.mutation_probability = mutation_probability
+        self.mutation_coefficient = mutation_coefficient
         self.robots = []
         self.genomes = []
         self.genomes_last_generation = []
@@ -54,12 +58,12 @@ class GaEngine:
         self.statistics.update_time(0, 0)
 
         print('\nGeneration', self.generation_num, 'started')
-        print('multithreading', self.MULTITHREADING)
+        print('multicore:', self.multicore)
 
     def step(self):
         # start_time = TimeUtil.current_time_millis()
 
-        if self.MULTITHREADING:
+        if self.multicore:
             threads = []
 
             # print('')
@@ -106,7 +110,7 @@ class GaEngine:
                 if robot.collision_with_object:
                     self.destroy_robot(robot)
         else:
-            # MULTITHREADING = False
+            # multicore = False
             for robot in self.robots:
                 robot.sense_and_act()
 
@@ -141,9 +145,9 @@ class GaEngine:
             robot.direction = 0
 
         left_obstacle_sensor = ProximitySensor(robot, genome.sensor_delta_direction, genome.sensor_saturation_value,
-                                               self.OBSTACLE_SENSOR_ERROR, genome.sensor_max_distance, self.scene)
+                                               self.obstacle_sensor_error, genome.sensor_max_distance, self.scene)
         right_obstacle_sensor = ProximitySensor(robot, -genome.sensor_delta_direction, genome.sensor_saturation_value,
-                                                self.OBSTACLE_SENSOR_ERROR, genome.sensor_max_distance, self.scene)
+                                                self.obstacle_sensor_error, genome.sensor_max_distance, self.scene)
         left_wheel_actuator = Actuator()
         right_wheel_actuator = Actuator()
         left_motor_controller = MotorController(left_obstacle_sensor, genome.motor_ctrl_coefficient,
@@ -203,6 +207,12 @@ class GaEngine:
             print('New best:', self.best_genome.to_string())
 
         num_genomes_to_select = round(self.population_num * self.SELECTION_PERCENTAGE)
+
+        if num_genomes_to_select < 2:
+            raise ValueError('The number of parents for the new generation is < 2. ' +
+                             'Please increase population (' + str(self.population_num) + ') or selection percentage (' +
+                             str(self.SELECTION_PERCENTAGE) + ')')
+
         genomes_selected = []
 
         # elitism: keep the best genomes in the new generation
@@ -248,7 +258,7 @@ class GaEngine:
         while num_genomes_to_create > 0:
             parent_a, parent_b = self.choose_parents(parents)
             new_genome = parent_a.crossover(parent_b, self.generation_num)
-            new_genome.mutation(self.MUTATION_PROBABILITY, self.MUTATION_COEFFICIENT)
+            new_genome.mutation(self.mutation_probability, self.mutation_coefficient)
             new_genomes.append(new_genome)
             num_genomes_to_create -= 1
 

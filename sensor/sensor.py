@@ -4,7 +4,7 @@ class Sensor:
         self.robot = robot
         self.delta_direction = delta_direction
         self.saturation_value = saturation_value
-        self.error = error  # errore percentuale (compreso tra 0 e 1)
+        self.error = error
         self.scene = scene
         self.value = 0
 

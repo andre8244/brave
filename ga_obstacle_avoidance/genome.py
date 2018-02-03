@@ -79,8 +79,8 @@ class Genome:
 
     def mutate_with_probability(self, value, mutation_probability, mutation_coefficient):
         if random.random() < mutation_probability:
-            percentage_std_dev = mutation_coefficient * value
-            return random.gauss(value, percentage_std_dev)
+            mutation_std_dev = mutation_coefficient * value
+            return random.gauss(value, mutation_std_dev)
         else:
             return value
 

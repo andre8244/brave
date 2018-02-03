@@ -57,9 +57,8 @@ class ProximitySensor(Sensor):
             if distance_from_nearest_obstacle < self.COLLISION_DISTANCE:
                 raise Collision(self.robot, nearest_obstacle)
 
-            # percentage standard deviation
-            percentage_std_dev = self.error * distance_from_nearest_obstacle
-            distance_with_error = random.gauss(distance_from_nearest_obstacle, percentage_std_dev)
+            error_std_dev = self.error * distance_from_nearest_obstacle
+            distance_with_error = random.gauss(distance_from_nearest_obstacle, error_std_dev)
             proximity_value = 1 / distance_with_error
 
             if proximity_value > self.saturation_value:

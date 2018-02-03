@@ -17,15 +17,19 @@ DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
 SCENE_MAX_SPEED = 3000
 STATISTICS_PANEL_WIDTH = 500
 
+scene = None
+screen = None
+engine = None
+statistics = None
 population_num = None
 scene_speed = None
 scene_path = None
 elitism_num = None
 robot_random_direction = None
-scene = None
-screen = None
-engine = None
-statistics = None
+multicore = None
+obstacle_sensor_error = None
+mutation_probability = None
+mutation_coefficient = None
 
 
 def initialize():
@@ -37,12 +41,17 @@ def initialize():
     global elitism_num
     global scene_path
     global robot_random_direction
+    global multicore
     global statistics
+    global obstacle_sensor_error
+    global mutation_probability
+    global mutation_coefficient
 
     scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
 
     statistics = Statistics(scene, screen)
-    engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction)
+    engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
+                      obstacle_sensor_error, mutation_probability, mutation_coefficient)
 
 
 def increase_scene_speed():
@@ -70,41 +79,80 @@ def parse_cli_arguments():
     global elitism_num
     global scene_path
     global robot_random_direction
+    global multicore
+    global obstacle_sensor_error
+    global mutation_probability
+    global mutation_coefficient
     global DEFAULT_SCENE_SPEED
     global DEFAULT_SCENE_PATH
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-p', '--population', help='Number of vehicles in each generation. Default: ' +
-                                      str(GaEngine.DEFAULT_POPULATION_NUM), type=int, metavar='POPULATION_NUM')
+                                      str(GaEngine.DEFAULT_POPULATION_NUM), type=int, metavar='NUM')
+
     parser.add_argument('-e', '--elite',
                         help='Number of vehicles carried over unaltered to a new generation. Default: ' + str(
-                            GaEngine.DEFAULT_ELITISM_NUM), type=int, metavar='ELITISM_NUM')
-    parser.add_argument('-r', '--randdir', help='Set an initial random direction to every vehicle', action="store_true")
+                            GaEngine.DEFAULT_ELITISM_NUM), type=int, metavar='NUM')
+
+    parser.add_argument('-m', '--mutation_prob',
+                        help='Probability that a mutation occurs on a single gene. Default: ' + str(
+                            GaEngine.DEFAULT_MUTATION_PROBABILITY), type=float, metavar='NUM')
+
+    parser.add_argument('-M', '--mutation_coeff',
+                        help='Coefficient used to alter a gene value during mutation. Default: ' + str(
+                            GaEngine.DEFAULT_MUTATION_COEFFICIENT), type=float, metavar='NUM')
+
     parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
-                        metavar='SCENE_FILE')
+                        metavar='FILE')
+
     parser.add_argument('-f', '--fps',
                         help='Number of frames per second (0 = maximum fps). Default: ' + str(DEFAULT_SCENE_SPEED),
-                        type=int, metavar='FPS_NUM')
+                        type=int, metavar='NUM')
+
+    parser.add_argument('-r', '--random_direction', help='Set an initial random direction for the vehicles',
+                        action="store_true")
+
+    parser.add_argument('-E', '--sensor_error',
+                        help='Coefficient used to simulate the obstacle sensor read error. Default: ' + str(
+                            GaEngine.DEFAULT_OBSTACLE_SENSOR_ERROR) + ', recommended: < 0.2', type=float, metavar='NUM')
+
+    parser.add_argument('-c', '--multicore', help='Enable multicore support (experimental)', action="store_true")
+
     args = parser.parse_args()
 
     elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite
     population_num = GaEngine.DEFAULT_POPULATION_NUM if args.population is None else args.population
-    robot_random_direction = args.randdir
+    mutation_probability = GaEngine.DEFAULT_MUTATION_PROBABILITY if args.mutation_prob is None else args.mutation_prob
+    mutation_coefficient = GaEngine.DEFAULT_MUTATION_COEFFICIENT if args.mutation_coeff is None else args.mutation_coeff
+    robot_random_direction = args.random_direction
     scene_speed = DEFAULT_SCENE_SPEED if args.fps is None else args.fps
     scene_path = DEFAULT_SCENE_PATH if args.scene is None else args.scene
+    obstacle_sensor_error = GaEngine.DEFAULT_OBSTACLE_SENSOR_ERROR if args.sensor_error is None else args.sensor_error
+    multicore = args.multicore
 
     # check parameters value
     if elitism_num < 0:
-        raise ValueError('Error: elite argument must be >= 0')
+        raise ValueError('Elite argument must be >= 0')
+
+    if population_num < 2:
+        raise ValueError('Population argument must be >= 2')
 
     if population_num <= elitism_num:
-        raise ValueError(
-            'Error: pop argument value (' + str(population_num) + ') must be > elite argument value (' + str(
-                elitism_num) + ')')
+        raise ValueError('Population argument (' + str(population_num) + ') must be > elite argument (' +
+                         str(elitism_num) + ')')
 
     if scene_speed < 0:
-        raise ValueError('Error: fps argument must be >= 0')
+        raise ValueError('FPS argument must be >= 0')
+
+    if obstacle_sensor_error < 0:
+        raise ValueError('Sensor error argument must be >= 0')
+
+    if mutation_probability < 0 or mutation_probability > 1:
+        raise ValueError('Mutation probability must be between 0 and 1')
+
+    if mutation_coefficient < 0:
+        raise ValueError('Mutation coefficient must be >= 0')
 
 
 if __name__ == '__main__':
