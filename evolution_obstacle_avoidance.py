@@ -49,7 +49,7 @@ def initialize():
 
     scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
 
-    statistics = Statistics(scene, screen)
+    statistics = Statistics(scene, screen, population_num)
     engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
                       obstacle_sensor_error, mutation_probability, mutation_coefficient)
 

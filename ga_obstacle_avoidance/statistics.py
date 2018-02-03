@@ -8,11 +8,12 @@ from time_util import TimeUtil
 class Statistics:
 
     LINE_SPACING = 45
-    DEFAULT_LEFT_MARGIN = 50
+    DEFAULT_LEFT_MARGIN = 45
 
-    def __init__(self, scene, screen):
+    def __init__(self, scene, screen, population_num):
         self.scene = scene
         self.screen = screen
+        self.population_num = population_num
         self.generation_num = None
         self.best_genome = None
         self.fitness_best_genome = None
@@ -61,8 +62,9 @@ class Statistics:
             generation_time = TimeUtil.format_time_seconds(self.generation_time_seconds)
 
             self.print_statistic(font, 'Generation: ' + str(self.generation_num))
-            self.print_statistic(font, 'Generation time: ' + generation_time)
+            self.print_statistic(font, 'Population: ' + str(self.population_num))
             self.print_statistic(font, 'Total time: ' + total_time)
+            self.print_statistic(font, 'Generation time: ' + generation_time)
 
             self.print_statistic(font, 'Best genome:')
             self.print_statistic(font, 'Fitness: ' + fitness_best, 80)
