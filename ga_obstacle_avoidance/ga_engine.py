@@ -19,15 +19,10 @@ class GaEngine:
     DEFAULT_OBSTACLE_SENSOR_ERROR = 0
     DEFAULT_MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
     DEFAULT_MUTATION_COEFFICIENT = 0.07
-    SELECTION_PERCENTAGE = 0.3  # 0 < SELECTION_PERCENTAGE < 1
+    DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
 
     def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
-                 obstacle_sensor_error, mutation_probability, mutation_coefficient):
-        if population_num <= elitism_num:
-            raise ValueError(
-                'Error: population_num (' + str(population_num) + ') must be greater than elitism_num (' + str(
-                    elitism_num) + ')')
-
+                 obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose):
         self.scene = scene
         self.statistics = statistics
         self.population_num = population_num
@@ -37,6 +32,8 @@ class GaEngine:
         self.obstacle_sensor_error = obstacle_sensor_error
         self.mutation_probability = mutation_probability
         self.mutation_coefficient = mutation_coefficient
+        self.selection_ratio = selection_ratio
+        self.verbose = verbose
         self.robots = []
         self.genomes = []
         self.genomes_last_generation = []
@@ -58,48 +55,47 @@ class GaEngine:
         self.statistics.update_time(0, 0)
 
         print('\nGeneration', self.generation_num, 'started')
-        print('multicore:', self.multicore)
+
+        self.printd(1, 'multicore:', self.multicore, 'num_cpu:', self.num_cpu)
 
     def step(self):
-        # start_time = TimeUtil.current_time_millis()
+        start_time = TimeUtil.current_time_millis()
 
         if self.multicore:
             threads = []
-
-            # print('')
-
             num_robots = len(self.robots)
             num_robots_per_cpu = math.floor(num_robots / self.num_cpu)
 
-            # print('num_robots_per_cpu', num_robots_per_cpu)
+            self.printd(2, 'num_robots_per_cpu:', num_robots_per_cpu)
 
             for i in range(self.num_cpu - 1):
                 start_pos = i * num_robots_per_cpu
                 end_pos = (i + 1) * num_robots_per_cpu
-                # print('core', str(i+1), 'positions', start_pos, ':', end_pos)
+                self.printd(2, 'core:', i + 1, 'positions:', start_pos, ':', end_pos)
                 robot_list = self.robots[start_pos:end_pos]
 
                 thread = ThreadGaRobot(robot_list)
                 thread.start()
-                # print('thread', str(i+1), 'started')
+                self.printd(2, 'thread', i + 1, 'started')
                 threads.append(thread)
 
             # last sublist of robots
             start_pos = (self.num_cpu - 1) * num_robots_per_cpu
-            # print('last core, start_pos', start_pos)
+            self.printd(2, 'last core, start_pos', start_pos)
             robot_list = self.robots[start_pos:]
 
             thread = ThreadGaRobot(robot_list)
             thread.start()
-            # print('last thread started')
+            self.printd(2, 'last thread started')
             threads.append(thread)
 
             for t in threads:
                 t.join()
 
-            # end_time = TimeUtil.current_time_millis()
-            # partial_duration = end_time - start_time
-            # print('   partial duration', partial_duration)
+            if self.verbose >= 2:
+                end_time = TimeUtil.current_time_millis()
+                partial_duration = end_time - start_time
+                print('Step partial duration', partial_duration)
 
             for robot in self.robots:
                 # ensure robot doesn't accidentaly go outside of the scene
@@ -113,10 +109,6 @@ class GaEngine:
             # multicore = False
             for robot in self.robots:
                 robot.sense_and_act()
-
-                # thread = ThreadGaRobot(robot)
-                # thread.start()
-                # threads.append(thread)
 
                 # ensure robot doesn't accidentaly go outside of the scene
                 if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
@@ -168,12 +160,12 @@ class GaEngine:
 
         self.scene.remove(robot)
         self.robots.remove(robot)
-        # print('Destroyed robot with fitness value', fitness_value)
+        self.printd(1, 'Destroyed robot with fitness value', fitness_value)
 
     def create_new_generation(self):
         self.genomes_last_generation = self.genomes
         genomes_selected = self.ga_selection()  # parents of the new generation
-        # print("\ngenomes selected", genomes_selected)
+        self.printd(1, '\ngenomes selected:', genomes_selected)
         self.generation_num += 1
         new_genomes = self.ga_crossover_mutation(genomes_selected)
         self.genomes = new_genomes
@@ -206,12 +198,12 @@ class GaEngine:
             self.best_genome = best_genome_current_generation
             print('New best:', self.best_genome.to_string())
 
-        num_genomes_to_select = round(self.population_num * self.SELECTION_PERCENTAGE)
+        num_genomes_to_select = round(self.population_num * self.selection_ratio)
 
         if num_genomes_to_select < 2:
-            raise ValueError('The number of parents for the new generation is < 2. ' +
-                             'Please increase population (' + str(self.population_num) + ') or selection percentage (' +
-                             str(self.SELECTION_PERCENTAGE) + ')')
+            raise ValueError('The number of parents selected to breed a new generation is < 2. ' +
+                             'Please increase population (' + str(self.population_num) + ') or selection ratio (' +
+                             str(self.selection_ratio) + ')')
 
         genomes_selected = []
 
@@ -277,3 +269,12 @@ class GaEngine:
         x = self.scene.width / 2
         y = self.scene.height / 2
         return x, y
+
+    def printd(self, min_debug_level, *args):
+        if self.verbose >= min_debug_level:
+            msg = ''
+
+            for arg in args:
+                msg += str(arg) + ' '
+
+            print(msg)

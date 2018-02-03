@@ -14,6 +14,7 @@ from time_util import TimeUtil
 
 DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
 DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
+DEFAULT_VERBOSE_VALUE = 0 # 0, 1, 2
 SCENE_MAX_SPEED = 3000
 STATISTICS_PANEL_WIDTH = 500
 
@@ -30,6 +31,8 @@ multicore = None
 obstacle_sensor_error = None
 mutation_probability = None
 mutation_coefficient = None
+selection_ratio = None
+verbose = None
 
 
 def initialize():
@@ -46,12 +49,14 @@ def initialize():
     global obstacle_sensor_error
     global mutation_probability
     global mutation_coefficient
+    global selection_ratio
+    global verbose
 
     scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
 
     statistics = Statistics(scene, screen, population_num)
     engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
-                      obstacle_sensor_error, mutation_probability, mutation_coefficient)
+                      obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose)
 
 
 def increase_scene_speed():
@@ -59,7 +64,8 @@ def increase_scene_speed():
 
     if scene.speed < SCENE_MAX_SPEED:
         scene.speed *= 1.5
-    print('scene.speed:', scene.speed)
+
+    print('Scene speed:', scene.speed)
 
 
 def decrease_scene_speed():
@@ -70,10 +76,14 @@ def decrease_scene_speed():
 
     if scene.speed > 1:
         scene.speed /= 1.5
-    print('scene.speed:', scene.speed)
+
+    print('Scene speed:', scene.speed)
 
 
 def parse_cli_arguments():
+    global DEFAULT_SCENE_SPEED
+    global DEFAULT_SCENE_PATH
+    global DEFAULT_VERBOSE_VALUE
     global population_num
     global scene_speed
     global elitism_num
@@ -83,10 +93,12 @@ def parse_cli_arguments():
     global obstacle_sensor_error
     global mutation_probability
     global mutation_coefficient
-    global DEFAULT_SCENE_SPEED
-    global DEFAULT_SCENE_PATH
+    global selection_ratio
+    global verbose
 
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('-v', '--verbose', help='Set verbosity. Default: 0', type=int, choices=range(0, 3))
 
     parser.add_argument('-p', '--population', help='Number of vehicles in each generation. Default: ' +
                                       str(GaEngine.DEFAULT_POPULATION_NUM), type=int, metavar='NUM')
@@ -103,7 +115,11 @@ def parse_cli_arguments():
                         help='Coefficient used to alter a gene value during mutation. Default: ' + str(
                             GaEngine.DEFAULT_MUTATION_COEFFICIENT), type=float, metavar='NUM')
 
-    parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
+    parser.add_argument('-s', '--selection_ratio',
+                        help='Ratio of parents selected to breed a new generation. Default: ' + str(
+                            GaEngine.DEFAULT_SELECTION_RATIO), type=float, metavar='NUM')
+
+    parser.add_argument('-S', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
                         metavar='FILE')
 
     parser.add_argument('-f', '--fps',
@@ -129,7 +145,9 @@ def parse_cli_arguments():
     scene_speed = DEFAULT_SCENE_SPEED if args.fps is None else args.fps
     scene_path = DEFAULT_SCENE_PATH if args.scene is None else args.scene
     obstacle_sensor_error = GaEngine.DEFAULT_OBSTACLE_SENSOR_ERROR if args.sensor_error is None else args.sensor_error
+    selection_ratio = GaEngine.DEFAULT_SELECTION_RATIO if args.selection_ratio is None else args.selection_ratio
     multicore = args.multicore
+    verbose = DEFAULT_VERBOSE_VALUE if args.verbose is None else args.verbose
 
     # check parameters value
     if elitism_num < 0:
@@ -154,6 +172,14 @@ def parse_cli_arguments():
     if mutation_coefficient < 0:
         raise ValueError('Mutation coefficient must be >= 0')
 
+    if selection_ratio <= 0 or selection_ratio > 1:
+        raise ValueError('Selection ratio must be between 0 (exclusive) and 1 (inclusive)')
+
+    if round(population_num * selection_ratio) < 2:
+        raise ValueError('The number of parents selected to breed a new generation is < 2. ' +
+                         'Please increase population (' + str(population_num) + ') or selection ratio (' +
+                         str(selection_ratio) + ')')
+
 
 if __name__ == '__main__':
     parse_cli_arguments()
@@ -175,11 +201,14 @@ if __name__ == '__main__':
             # elif event.type == KEYDOWN and event.key == K_s:
             #     scene.save()
 
-        # start_time = TimeUtil.current_time_millis()
-        engine.step()
-        # end_time = TimeUtil.current_time_millis()
-        # step_duration = end_time - start_time
-        # print('total step duration', step_duration)
+        if verbose < 2:
+            engine.step()
+        else:
+            start_time = TimeUtil.current_time_millis()
+            engine.step()
+            end_time = TimeUtil.current_time_millis()
+            step_duration = end_time - start_time
+            print('Step duration: ', step_duration)
 
         screen.fill(Color.BLACK)
 
