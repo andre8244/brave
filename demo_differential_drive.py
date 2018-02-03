@@ -28,7 +28,7 @@ def print_wheels_speed():
 
 if __name__ == '__main__':
     pygame.init()
-
+    pygame.display.set_caption("Differential drive - BRAVE")
     screen = pygame.display.set_mode(SCREEN_SIZE)
     clock = pygame.time.Clock()
     reset_scene()

@@ -102,6 +102,7 @@ def remove_box():
 
 if __name__ == '__main__':
     pygame.init()
+    pygame.display.set_caption("Scene editor - BRAVE")
     clock = pygame.time.Clock()
     init_scene()
 

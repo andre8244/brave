@@ -39,6 +39,8 @@ class GaEngine:
         self.best_genome = None
         self.generation_num = 1
         self.num_cpu = multiprocessing.cpu_count()
+        self.start_total_time = TimeUtil.current_time_millis()
+        self.start_generation_time = self.start_total_time
 
         for i in range(self.population_num):
             x, y = self.robot_start_position()
@@ -48,7 +50,9 @@ class GaEngine:
             scene.put(robot)
             self.robots.append(robot)
 
-        self.statistics.update(self.generation_num, None, None)
+        self.statistics.update_data(self.generation_num, None, None)
+        self.statistics.update_time(0, 0)
+
         print('\nGeneration', self.generation_num, 'started')
         print('multithreading', self.MULTITHREADING)
 
@@ -122,7 +126,13 @@ class GaEngine:
         if not self.robots:
             print('Generation', self.generation_num, 'terminated')
             self.create_new_generation()
-            self.statistics.update(self.generation_num, self.best_genome, self.best_genome.fitness)
+            self.statistics.update_data(self.generation_num, self.best_genome, self.best_genome.fitness)
+
+        # update statistics time
+        current_time = TimeUtil.current_time_millis()
+        total_time_seconds = math.floor((current_time - self.start_total_time) / 1000)
+        generation_time_seconds = math.floor((current_time - self.start_generation_time) / 1000)
+        self.statistics.update_time(total_time_seconds, generation_time_seconds)
 
     def build_robot(self, x, y, genome, label):
         robot = GaRobot(x, y, self.ROBOT_SIZE, genome)
@@ -179,6 +189,8 @@ class GaEngine:
             self.scene.put(robot)
             self.robots.append(robot)
 
+        # reset generation time
+        self.start_generation_time = TimeUtil.current_time_millis()
         print('\nGeneration', self.generation_num, 'started')
 
     def ga_selection(self):

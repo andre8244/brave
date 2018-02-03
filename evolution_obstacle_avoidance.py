@@ -1,6 +1,5 @@
 import sys
 import pygame
-import math
 import argparse
 
 from pygame.locals import *
@@ -41,12 +40,6 @@ def initialize():
     global statistics
 
     scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
-
-    # redefine pygame screen in order to display statistics
-    # screen_width = scene.width + STATISTICS_PANEL_WIDTH
-    # screen_height = scene.height
-    # screen = pygame.display.set_mode((screen_width, screen_height))
-    # scene.screen = screen
 
     statistics = Statistics(scene, screen)
     engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction)
@@ -117,6 +110,7 @@ def parse_cli_arguments():
 if __name__ == '__main__':
     parse_cli_arguments()
     pygame.init()
+    pygame.display.set_caption("Obstacle avoidance evolution - BRAVE")
     clock = pygame.time.Clock()
     initialize()
 
