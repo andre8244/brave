@@ -106,7 +106,9 @@ def parse_cli_arguments():
         raise ValueError('Error: elite argument must be >= 0')
 
     if population_num <= elitism_num:
-        raise ValueError('Error: pop argument value must be > elite argument value')
+        raise ValueError(
+            'Error: pop argument value (' + str(population_num) + ') must be > elite argument value (' + str(
+                elitism_num) + ')')
 
     if scene_speed < 0:
         raise ValueError('Error: fps argument must be >= 0')
