@@ -1,1 +1,7 @@
 Genome(fitness:13250.83 generation_num:17 robot_wheel_radius:9.73 motor_ctrl_coefficient:600 motor_ctrl_min_actuator_value:10 sensor_delta_direction:0.59 sensor_saturation_value:21.34 sensor_max_distance:70.67)
+
+Genome(fitness:19428.89 generation_num:25 robot_wheel_radius:29.83 motor_ctrl_coefficient:562.78 motor_ctrl_min_actuator_value:12.34 sensor_delta_direction:0.43 sensor_saturation_value:68.28 sensor_max_distance:135.66)
+
+Genome(fitness:18163.61 generation_num:25 robot_wheel_radius:25.63 motor_ctrl_coefficient:517.51 motor_ctrl_min_actuator_value:12.25 sensor_delta_direction:0.49 sensor_saturation_value:34.17 sensor_max_distance:138.92)
+
+Genome(fitness:17277.36 generation_num:25 robot_wheel_radius:27.51 motor_ctrl_coefficient:556.12 motor_ctrl_min_actuator_value:12.43 sensor_delta_direction:0.47 sensor_saturation_value:71.25 sensor_max_distance:129.98)

@@ -69,7 +69,7 @@ class Statistics:
             self.print_statistic(font, 'Best genome:')
             self.print_statistic(font, 'Fitness: ' + fitness_best, 80)
             self.print_statistic(font, 'Generation born: ' + generation_num_best, 80)
-            self.print_statistic(font, 'Robot wheel radius: ' + robot_wheel_radius_best, 80)
+            self.print_statistic(font, 'Vehicle wheel radius: ' + robot_wheel_radius_best, 80)
             self.print_statistic(font, 'Motor ctrl coefficient: ' + motor_ctrl_coefficient_best, 80)
             self.print_statistic(font, 'Motor ctrl min actuator value: ' + motor_ctrl_min_actuator_value_best, 80)
             self.print_statistic(font, 'Sensor direction: ' + sensor_delta_direction_best_deg + ' deg (' +

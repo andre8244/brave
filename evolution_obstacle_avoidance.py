@@ -14,7 +14,7 @@ from time_util import TimeUtil
 
 DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
 DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
-DEFAULT_VERBOSE_VALUE = 0 # 0, 1, 2
+DEFAULT_VERBOSE_VALUE = 0  # 0, 1, 2
 SCENE_MAX_SPEED = 3000
 STATISTICS_PANEL_WIDTH = 500
 

@@ -4,6 +4,8 @@ import math
 
 from ga_obstacle_avoidance.ga_robot import GaRobot
 from ga_obstacle_avoidance.thread_ga_robot import ThreadGaRobot
+from geometry.color import Color
+from scene.box import Box
 from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
@@ -20,6 +22,10 @@ class GaEngine:
     DEFAULT_MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
     DEFAULT_MUTATION_COEFFICIENT = 0.07
     DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
+    LONG_LASTING_GENERATION_STEP_NUM = 3000  # 3000
+    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00001  # increasing probability to add a new obstacle in the scene
+    BOX_MIN_SIZE = 20
+    BOX_MAX_SIZE = 60
 
     def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
                  obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose):
@@ -42,6 +48,9 @@ class GaEngine:
         self.num_cpu = multiprocessing.cpu_count()
         self.start_total_time = TimeUtil.current_time_millis()
         self.start_generation_time = self.start_total_time
+        self.generation_step_num = 0
+        self.new_obstacle_probability = 0
+        self.obstascles_added = []
 
         for i in range(self.population_num):
             x, y = self.robot_start_position()
@@ -60,6 +69,9 @@ class GaEngine:
 
     def step(self):
         start_time = TimeUtil.current_time_millis()
+
+        if self.generation_step_num % 500 == 0: ### todo delete
+            print('generation_step_num', self.generation_step_num)
 
         if self.multicore:
             threads = []
@@ -118,6 +130,15 @@ class GaEngine:
                 if robot.collision_with_object:
                     self.destroy_robot(robot)
 
+        # create new obstacles for long lasting generations
+        if self.generation_step_num > self.LONG_LASTING_GENERATION_STEP_NUM:
+            self.new_obstacle_probability += self.LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA
+
+            if random.random() < self.new_obstacle_probability:
+                box = self.create_box()
+                self.scene.put(box)
+                self.obstascles_added.append(box)
+
         # check population extinction
         if not self.robots:
             print('Generation', self.generation_num, 'terminated')
@@ -129,6 +150,8 @@ class GaEngine:
         total_time_seconds = math.floor((current_time - self.start_total_time) / 1000)
         generation_time_seconds = math.floor((current_time - self.start_generation_time) / 1000)
         self.statistics.update_time(total_time_seconds, generation_time_seconds)
+
+        self.generation_step_num += 1
 
     def build_robot(self, x, y, genome, label):
         robot = GaRobot(x, y, self.ROBOT_SIZE, genome)
@@ -184,6 +207,15 @@ class GaEngine:
             robot = self.build_robot(x, y, genome, label)
             self.scene.put(robot)
             self.robots.append(robot)
+
+        self.new_obstacle_probability = 0
+        self.generation_step_num = 0
+
+        # remove all obstacles added to a long lasting generation
+        for box in self.obstascles_added:
+            self.scene.remove(box)
+
+        self.obstascles_added = []
 
         # reset generation time
         self.start_generation_time = TimeUtil.current_time_millis()
@@ -278,3 +310,10 @@ class GaEngine:
                 msg += str(arg) + ' '
 
             print(msg)
+
+    def create_box(self):
+        x = random.randint(0, self.scene.width)
+        y = random.randint(0, self.scene.height)
+
+        size = random.randint(self.BOX_MIN_SIZE, self.BOX_MAX_SIZE)
+        return Box(x, y, size, Color.random_bright())
