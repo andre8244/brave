@@ -86,7 +86,7 @@ def add_robots(number_to_add=1):
         y = random.randint(0, SCREEN_HEIGHT)
         robot = build_robot(x, y, 10, math.pi / 4)
         scene.put(robot)
-    print('number of robots:', len(robots))
+    # print('number of robots:', len(robots))
 
 
 def remove_robot():
@@ -95,7 +95,7 @@ def remove_robot():
 
     if len(robots) > 0:
         scene.remove(robots.pop(0))
-    print('number of robots:', len(robots))
+    # print('number of robots:', len(robots))
 
 
 def add_lights(number_to_add=1):
@@ -108,10 +108,10 @@ def add_lights(number_to_add=1):
         emitting_power = random.randint(LIGHT_EMITTING_POWER_MIN, LIGHT_EMITTING_POWER_INTERVAL)
         light = build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
         scene.put(light)
-    print('number of lights:', len(lights))
+    # print('number of lights:', len(lights))
 
 
-def add_light_to_cursor():
+def add_light_at_cursor():
     global scene
     global lights
 
@@ -130,7 +130,7 @@ def add_light_to_cursor():
 #     print('number of lights:', len(lights))
 
 
-def remove_light_to_cursor():
+def remove_light_at_cursor():
     global scene
     global lights
 
@@ -167,13 +167,13 @@ def init_scene(screen):
 def increase_scene_speed():
     if scene.speed < 200:
         scene.speed *= 1.5
-    print('scene.speed:', scene.speed)
+    print('Scene speed:', scene.speed)
 
 
 def decrease_scene_speed():
     if scene.speed > 1:
         scene.speed /= 1.5
-    print('scene.speed:', scene.speed)
+    print('Scene speed:', scene.speed)
 
 
 if __name__ == '__main__':
@@ -200,11 +200,11 @@ if __name__ == '__main__':
             # elif event.type == KEYDOWN and event.key == K_COMMA:
             #     add_lights()
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                add_light_to_cursor()
+                add_light_at_cursor()
             # elif event.type == KEYDOWN and event.key == K_PERIOD:
             #     remove_light()
             elif event.type == MOUSEBUTTONDOWN and event.button == 3:
-                remove_light_to_cursor()
+                remove_light_at_cursor()
             elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
                 increase_scene_speed()
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
