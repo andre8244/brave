@@ -32,8 +32,12 @@ SCREEN_MARGIN = ROBOT_SIZE / 2
 SCENE_SPEED_INITIAL = 25
 
 N_ROBOTS = 10
-N_BOXES = 10
-N_WALLS = 0
+N_INITIAL_BOXES = 0
+N_INITIAL_WALLS = 0
+
+BOX_SIZE = 40
+BOX_SIZE_MIN = 20
+BOX_SIZE_INTERVAL = 60
 
 scene = None
 robots = None
@@ -101,7 +105,7 @@ def remove_robot():
     print('number of robots:', len(robots))
 
 
-def add_boxes(number_to_add=1):
+def create_boxes(number_to_add=1):
     global scene
     global obstacles
 
@@ -109,11 +113,37 @@ def add_boxes(number_to_add=1):
         x = random.randint(0, SCREEN_WIDTH)
         y = random.randint(0, SCREEN_HEIGHT)
 
-        size = random.randint(20, 60)
-        box = build_box(x, y, size, Color.random_color(127, 127, 127))
+        size = random.randint(BOX_SIZE_MIN, BOX_SIZE_INTERVAL)
+        box = build_box(x, y, size, Color.random_bright())
         scene.put(box)
 
     print('number of obstacles:', len(obstacles))
+
+
+def add_box_at_cursor():
+    global scene
+    global obstacles
+
+    x, y = pygame.mouse.get_pos()
+    box = build_box(x, y, BOX_SIZE, Color.random_bright())
+    scene.put(box)
+
+
+def remove_box_at_cursor():
+    global scene
+    global obstacles
+
+    x, y = pygame.mouse.get_pos()
+
+    for obstacle in obstacles:
+        if issubclass(type(obstacle), Box):
+            box = obstacle
+
+            if x <= box.x + (box.size / 2) and x >= box.x - (box.size / 2) and y <= box.y + (
+                    box.size / 2) and y >= box.y - (box.size / 2):
+                scene.remove(box)
+                obstacles.remove(box)
+                break
 
 
 def add_walls(number_to_add=1):
@@ -135,13 +165,13 @@ def add_walls(number_to_add=1):
     print('number of obstacles:', len(obstacles))
 
 
-def remove_box():
-    global scene
-    global obstacles
-
-    if len(obstacles) > 0:
-        scene.remove(obstacles.pop(0))
-    print('number of obstacles:', len(obstacles))
+# def remove_box():
+#     global scene
+#     global obstacles
+#
+#     if len(obstacles) > 0:
+#         scene.remove(obstacles.pop(0))
+#     print('number of obstacles:', len(obstacles))
 
 
 def init_scene(screen):
@@ -154,8 +184,8 @@ def init_scene(screen):
     scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
-    add_boxes(N_BOXES)
-    add_walls(N_WALLS)
+    create_boxes(N_INITIAL_BOXES)
+    add_walls(N_INITIAL_WALLS)
 
     # wall = Wall(Point(0,0), Point(300, 500), Color.YELLOW)
     # scene.put(wall)
@@ -197,16 +227,8 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     init_scene(screen)
 
-    # tick = 0
-
     while True:
-        # keys_pressed = pygame.key.get_pressed()
-
         for event in pygame.event.get():
-
-            if event.type == KEYDOWN:
-                print('key', event.key) ### todo delete
-
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
@@ -215,10 +237,14 @@ if __name__ == '__main__':
                 add_robots()
             elif event.type == KEYDOWN and event.key == K_l:
                 remove_robot()
-            elif event.type == KEYDOWN and event.key == K_COMMA:
-                add_boxes()
-            elif event.type == KEYDOWN and event.key == K_PERIOD:
-                remove_box()
+            # elif event.type == KEYDOWN and event.key == K_COMMA:
+            #     add_boxes()
+            # elif event.type == KEYDOWN and event.key == K_PERIOD:
+            #     remove_box()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                add_box_at_cursor()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                remove_box_at_cursor()
             elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
                 increase_scene_speed()
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
@@ -226,7 +252,7 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and event.key == K_s:
                 scene.save()
 
-        # teletrasporto ai margini
+        # teleport at the margins
         for robot in robots:
             robot.sense_and_act()
 
@@ -238,8 +264,6 @@ if __name__ == '__main__':
                 robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
             if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
                 robot.y = -SCREEN_MARGIN
-
-            # print("robot rect:", robot.rect)
 
         screen.fill(Color.BLACK)
 

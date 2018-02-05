@@ -98,7 +98,7 @@ def remove_robot():
     # print('number of robots:', len(robots))
 
 
-def add_lights(number_to_add=1):
+def create_lights(number_to_add=1):
     global scene
     global lights
 
@@ -141,6 +141,7 @@ def remove_light_at_cursor():
                 light.size / 2) and y >= light.y - (light.size / 2):
             scene.remove(light)
             lights.remove(light)
+            break
 
 
 def init_scene(screen):
@@ -153,7 +154,7 @@ def init_scene(screen):
     scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
-    add_lights(N_INITIAL_LIGHTS)
+    create_lights(N_INITIAL_LIGHTS)
 
     # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
     # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
@@ -183,11 +184,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     init_scene(screen)
 
-    # tick = 0
-
     while True:
-        # keys_pressed = pygame.key.get_pressed()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
@@ -210,7 +207,7 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
 
-        # teletrasporto ai margini
+        # teleport at the margins
         for robot in robots:
             robot.sense_and_act()
 
