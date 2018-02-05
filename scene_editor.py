@@ -3,7 +3,7 @@ import pygame
 import random
 
 from pygame.locals import *
-from geometry.color import Color
+from util.color import Color
 from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall

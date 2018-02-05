@@ -3,7 +3,7 @@ import pygame
 
 from pygame.locals import *
 from robot.differential_drive_robot import DifferentialDriveRobot
-from geometry.color import Color
+from util.color import Color
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 

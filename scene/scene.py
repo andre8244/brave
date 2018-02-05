@@ -4,7 +4,7 @@ import pygame
 from geometry.point import Point
 from scene.wall import Wall
 from scene.box import Box
-from geometry.color import Color
+from util.color import Color
 
 
 class Scene:

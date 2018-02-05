@@ -5,7 +5,7 @@ import random
 
 from pygame.locals import *
 from robot.sensor_driven_robot import SensorDrivenRobot
-from geometry.color import Color
+from util.color import Color
 from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall
@@ -203,6 +203,10 @@ if __name__ == '__main__':
         # keys_pressed = pygame.key.get_pressed()
 
         for event in pygame.event.get():
+
+            if event.type == KEYDOWN:
+                print('key', event.key) ### todo delete
+
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
@@ -215,9 +219,9 @@ if __name__ == '__main__':
                 add_boxes()
             elif event.type == KEYDOWN and event.key == K_PERIOD:
                 remove_box()
-            elif event.type == KEYDOWN and event.key == K_PLUS:
+            elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
                 increase_scene_speed()
-            elif event.type == KEYDOWN and event.key == K_MINUS:
+            elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
             elif event.type == KEYDOWN and event.key == K_s:
                 scene.save()

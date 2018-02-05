@@ -5,11 +5,11 @@ import argparse
 from pygame.locals import *
 
 from ga_obstacle_avoidance.statistics import Statistics
-from geometry.color import Color
+from util.color import Color
 from scene.scene import Scene
 from ga_obstacle_avoidance.ga_engine import GaEngine
 from robot.sensor_driven_robot import SensorDrivenRobot
-from time_util import TimeUtil
+from util.time_util import TimeUtil
 
 
 DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
@@ -194,9 +194,9 @@ if __name__ == '__main__':
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
                 initialize()
-            elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93):
+            elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
                 increase_scene_speed()
-            elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47):
+            elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
             # elif event.type == KEYDOWN and event.key == K_s:
             #     scene.save()

@@ -2,7 +2,7 @@ import pygame
 
 from geometry.point import Point
 from scene.obstacle import Obstacle
-from geometry.color import Color
+from util.color import Color
 
 
 class Box(Obstacle):

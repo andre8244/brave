@@ -1,13 +1,16 @@
 import pygame
 import math
 
-from geometry.color import Color
-from time_util import TimeUtil
+from util.color import Color
+from util.time_util import TimeUtil
 
 
 class Statistics:
 
-    LINE_SPACING = 45
+    FONT_SIZE = 26
+    LINE_SPACING_MIN = 25
+    LINE_SPACING_MAX = 45
+    SCENE_HEIGHT_THRESHOLD = 700
     DEFAULT_LEFT_MARGIN = 45
 
     def __init__(self, scene, screen, population_num):
@@ -21,6 +24,11 @@ class Statistics:
         self.generation_time_seconds = None
         self.line_num = None
 
+        if scene.height > self.SCENE_HEIGHT_THRESHOLD:
+            self.line_spacing = self.LINE_SPACING_MAX
+        else:
+            self.line_spacing = self.LINE_SPACING_MIN
+
     def update_data(self, generation_num, best_genome, fitness_best_genome):
         self.generation_num = generation_num
         self.best_genome = best_genome
@@ -32,7 +40,7 @@ class Statistics:
 
     def show(self):
         if pygame.font:
-            font = pygame.font.Font(None, 28)
+            font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
 
             if self.best_genome is None:
@@ -83,6 +91,6 @@ class Statistics:
             left_margin = self.DEFAULT_LEFT_MARGIN
 
         line = font.render(text, 1, Color.WHITE)
-        lint_pos = pygame.Rect(self.scene.width + left_margin, self.line_num * self.LINE_SPACING, 20, 20)
+        lint_pos = pygame.Rect(self.scene.width + left_margin, self.line_num * self.line_spacing, 20, 20)
         self.screen.blit(line, lint_pos)
         self.line_num += 1

@@ -4,13 +4,13 @@ import math
 
 from ga_obstacle_avoidance.ga_robot import GaRobot
 from ga_obstacle_avoidance.thread_ga_robot import ThreadGaRobot
-from geometry.color import Color
+from util.color import Color
 from scene.box import Box
 from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 from ga_obstacle_avoidance.genome import Genome
-from time_util import TimeUtil
+from util.time_util import TimeUtil
 
 
 class GaEngine:
