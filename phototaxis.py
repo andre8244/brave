@@ -27,9 +27,13 @@ SCREEN_MARGIN = ROBOT_SIZE / 2
 SCENE_SPEED_INITIAL = 25
 
 N_ROBOTS = 5
-N_LIGHTS = 5
+N_INITIAL_LIGHTS = 0
 
 PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
+
+LIGHT_EMITTING_POWER = 20
+LIGHT_EMITTING_POWER_MIN = 10
+LIGHT_EMITTING_POWER_INTERVAL = 30
 
 scene = None
 robots = None
@@ -101,19 +105,42 @@ def add_lights(number_to_add=1):
     for i in range(number_to_add):
         x = random.randint(0, SCREEN_WIDTH)
         y = random.randint(0, SCREEN_HEIGHT)
-        emitting_power = random.randint(10, 25)
+        emitting_power = random.randint(LIGHT_EMITTING_POWER_MIN, LIGHT_EMITTING_POWER_INTERVAL)
         light = build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
         scene.put(light)
     print('number of lights:', len(lights))
 
 
-def remove_light():
+def add_light_to_cursor():
     global scene
     global lights
 
-    if len(lights) > 0:
-        scene.remove(lights.pop(0))
-    print('number of lights:', len(lights))
+    x, y = pygame.mouse.get_pos()
+    light = build_light(x, y, LIGHT_EMITTING_POWER, Color.YELLOW, Color.BLACK)
+    scene.put(light)
+    # print('number of lights:', len(lights))
+
+
+# def remove_light():
+#     global scene
+#     global lights
+#
+#     if len(lights) > 0:
+#         scene.remove(lights.pop(0))
+#     print('number of lights:', len(lights))
+
+
+def remove_light_to_cursor():
+    global scene
+    global lights
+
+    x, y = pygame.mouse.get_pos()
+
+    for light in lights:
+        if x <= light.x + (light.size / 2) and x >= light.x - (light.size / 2) and y <= light.y + (
+                light.size / 2) and y >= light.y - (light.size / 2):
+            scene.remove(light)
+            lights.remove(light)
 
 
 def init_scene(screen):
@@ -126,7 +153,7 @@ def init_scene(screen):
     scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
 
     add_robots(N_ROBOTS)
-    add_lights(N_LIGHTS)
+    add_lights(N_INITIAL_LIGHTS)
 
     # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
     # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
@@ -170,10 +197,14 @@ if __name__ == '__main__':
                 add_robots()
             elif event.type == KEYDOWN and event.key == K_l:
                 remove_robot()
-            elif event.type == KEYDOWN and event.key == K_COMMA:
-                add_lights()
-            elif event.type == KEYDOWN and event.key == K_PERIOD:
-                remove_light()
+            # elif event.type == KEYDOWN and event.key == K_COMMA:
+            #     add_lights()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                add_light_to_cursor()
+            # elif event.type == KEYDOWN and event.key == K_PERIOD:
+            #     remove_light()
+            elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                remove_light_to_cursor()
             elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
                 increase_scene_speed()
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
