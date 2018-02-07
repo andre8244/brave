@@ -27,10 +27,10 @@ class GaEngine:
     BOX_MIN_SIZE = 20
     BOX_MAX_SIZE = 60
 
-    def __init__(self, scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
+    def __init__(self, scene, side_panel, population_num, elitism_num, robot_random_direction, multicore,
                  obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose):
         self.scene = scene
-        self.statistics = statistics
+        self.side_panel = side_panel
         self.population_num = population_num
         self.elitism_num = elitism_num
         self.robot_random_direction = robot_random_direction
@@ -60,8 +60,8 @@ class GaEngine:
             scene.put(robot)
             self.robots.append(robot)
 
-        self.statistics.update_data(self.generation_num, None, None)
-        self.statistics.update_time(0, 0)
+        self.side_panel.update_ga_data(self.generation_num, None, None)
+        self.side_panel.update_ga_time(0, 0)
 
         print('\nGeneration', self.generation_num, 'started')
 
@@ -143,13 +143,13 @@ class GaEngine:
         if not self.robots:
             print('Generation', self.generation_num, 'terminated')
             self.create_new_generation()
-            self.statistics.update_data(self.generation_num, self.best_genome, self.best_genome.fitness)
+            self.side_panel.update_ga_data(self.generation_num, self.best_genome, self.best_genome.fitness)
 
         # update statistics time
         current_time = TimeUtil.current_time_millis()
         total_time_seconds = math.floor((current_time - self.start_total_time) / 1000)
         generation_time_seconds = math.floor((current_time - self.start_generation_time) / 1000)
-        self.statistics.update_time(total_time_seconds, generation_time_seconds)
+        self.side_panel.update_ga_time(total_time_seconds, generation_time_seconds)
 
         self.generation_step_num += 1
 

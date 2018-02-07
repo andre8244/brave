@@ -4,7 +4,7 @@ import argparse
 
 from pygame.locals import *
 
-from ga_obstacle_avoidance.statistics import Statistics
+from util.side_panel import SidePanel
 from util.color import Color
 from scene.scene import Scene
 from ga_obstacle_avoidance.ga_engine import GaEngine
@@ -21,7 +21,7 @@ STATISTICS_PANEL_WIDTH = 500
 scene = None
 screen = None
 engine = None
-statistics = None
+side_panel = None
 population_num = None
 scene_speed = None
 scene_path = None
@@ -45,7 +45,7 @@ def initialize():
     global scene_path
     global robot_random_direction
     global multicore
-    global statistics
+    global side_panel
     global obstacle_sensor_error
     global mutation_probability
     global mutation_coefficient
@@ -54,8 +54,8 @@ def initialize():
 
     scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
 
-    statistics = Statistics(scene, screen, population_num)
-    engine = GaEngine(scene, statistics, population_num, elitism_num, robot_random_direction, multicore,
+    side_panel = SidePanel(scene, screen, population_num)
+    engine = GaEngine(scene, side_panel, population_num, elitism_num, robot_random_direction, multicore,
                       obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose)
 
 
@@ -115,11 +115,11 @@ def parse_cli_arguments():
                         help='Coefficient used to alter a gene value during mutation. Default: ' + str(
                             GaEngine.DEFAULT_MUTATION_COEFFICIENT), type=float, metavar='NUM')
 
-    parser.add_argument('-s', '--selection_ratio',
+    parser.add_argument('-S', '--selection_ratio',
                         help='Ratio of parents selected to breed a new generation. Default: ' + str(
                             GaEngine.DEFAULT_SELECTION_RATIO), type=float, metavar='NUM')
 
-    parser.add_argument('-S', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
+    parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + DEFAULT_SCENE_PATH,
                         metavar='FILE')
 
     parser.add_argument('-f', '--fps',
@@ -181,6 +181,18 @@ def parse_cli_arguments():
                          str(selection_ratio) + ')')
 
 
+def printd(min_debug_level, *args):
+    global verbose
+
+    if verbose >= min_debug_level:
+        msg = ''
+
+        for arg in args:
+            msg += str(arg) + ' '
+
+        print(msg)
+
+
 if __name__ == '__main__':
     parse_cli_arguments()
     pygame.init()
@@ -198,17 +210,15 @@ if __name__ == '__main__':
                 increase_scene_speed()
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
+            # todo:
             # elif event.type == KEYDOWN and event.key == K_s:
             #     scene.save()
 
-        if verbose < 2:
-            engine.step()
-        else:
-            start_time = TimeUtil.current_time_millis()
-            engine.step()
-            end_time = TimeUtil.current_time_millis()
-            step_duration = end_time - start_time
-            print('Step duration: ', step_duration)
+        start_time = TimeUtil.current_time_millis()
+        engine.step()
+        end_time = TimeUtil.current_time_millis()
+        step_duration = end_time - start_time
+        printd(2, 'Step duration: ', step_duration)
 
         screen.fill(Color.BLACK)
 
@@ -218,7 +228,7 @@ if __name__ == '__main__':
             if issubclass(type(obj), SensorDrivenRobot) and obj.label is not None:
                 obj.draw_label(screen)
 
-        statistics.show()
+        side_panel.show_ga_statistics()
 
         pygame.display.flip()
         int_scene_speed = int(round(scene.speed))

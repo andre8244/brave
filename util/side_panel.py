@@ -5,13 +5,14 @@ from util.color import Color
 from util.time_util import TimeUtil
 
 
-class Statistics:
+class SidePanel:
 
     FONT_SIZE = 26
     LINE_SPACING_MIN = 25
     LINE_SPACING_MAX = 45
     SCENE_HEIGHT_THRESHOLD = 700
-    DEFAULT_LEFT_MARGIN = 45
+    DEFAULT_MARGIN = 45
+    LEFT_MARGIN = 30
 
     def __init__(self, scene, screen, population_num):
         self.scene = scene
@@ -29,16 +30,16 @@ class Statistics:
         else:
             self.line_spacing = self.LINE_SPACING_MIN
 
-    def update_data(self, generation_num, best_genome, fitness_best_genome):
+    def update_ga_data(self, generation_num, best_genome, fitness_best_genome):
         self.generation_num = generation_num
         self.best_genome = best_genome
         self.fitness_best_genome = fitness_best_genome
 
-    def update_time(self, total_time_seconds, generation_time_seconds):
+    def update_ga_time(self, total_time_seconds, generation_time_seconds):
         self.total_time_seconds = total_time_seconds
         self.generation_time_seconds = generation_time_seconds
 
-    def show(self):
+    def show_ga_statistics(self):
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
@@ -75,22 +76,31 @@ class Statistics:
             self.print_statistic(font, 'Generation time: ' + generation_time)
 
             self.print_statistic(font, 'Best genome:')
-            self.print_statistic(font, 'Fitness: ' + fitness_best, 80)
-            self.print_statistic(font, 'Generation born: ' + generation_num_best, 80)
-            self.print_statistic(font, 'Vehicle wheel radius: ' + robot_wheel_radius_best, 80)
-            self.print_statistic(font, 'Motor ctrl coefficient: ' + motor_ctrl_coefficient_best, 80)
-            self.print_statistic(font, 'Motor ctrl min actuator value: ' + motor_ctrl_min_actuator_value_best, 80)
+            self.print_statistic(font, 'Fitness: ' + fitness_best, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Generation born: ' + generation_num_best, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Vehicle wheel radius: ' + robot_wheel_radius_best, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Motor ctrl coefficient: ' + motor_ctrl_coefficient_best, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Motor ctrl min actuator value: ' + motor_ctrl_min_actuator_value_best,
+                                 self.LEFT_MARGIN)
             self.print_statistic(font, 'Sensor direction: ' + sensor_delta_direction_best_deg + ' deg (' +
-                                 sensor_delta_direction_best_rad + ' rad)', 80)
+                                 sensor_delta_direction_best_rad + ' rad)', self.LEFT_MARGIN)
 
-            self.print_statistic(font, 'Sensor saturation value: ' + sensor_saturation_value_best, 80)
-            self.print_statistic(font, 'Sensor max distance: ' + sensor_max_distance_best, 80)
+            self.print_statistic(font, 'Sensor saturation value: ' + sensor_saturation_value_best, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Sensor max distance: ' + sensor_max_distance_best, self.LEFT_MARGIN)
 
-    def print_statistic(self, font, text, left_margin=None):
-        if left_margin is None:
-            left_margin = self.DEFAULT_LEFT_MARGIN
+            # controls
 
+            self.print_statistic(font, 'Controls:')
+            # todo:
+            # self.print_statistic(font, 'S : save evolution status to file', self.MARGIN_INDENTED)
+            self.print_statistic(font, 'R : restart evolution', self.LEFT_MARGIN)
+            self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+
+    def print_statistic(self, font, text, extra_margin=0):
         line = font.render(text, 1, Color.WHITE)
-        lint_pos = pygame.Rect(self.scene.width + left_margin, self.line_num * self.line_spacing, 20, 20)
+        x_pos = self.scene.width + self.DEFAULT_MARGIN + extra_margin
+        y_pos = self.line_num * self.line_spacing
+        lint_pos = pygame.Rect(x_pos, y_pos, 20, 20)
         self.screen.blit(line, lint_pos)
         self.line_num += 1
