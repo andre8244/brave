@@ -130,3 +130,9 @@ class Genome:
             round(self.sensor_delta_direction, 2)) + ' sensor_saturation_value:' + repr(
             round(self.sensor_saturation_value, 2)) + ' sensor_max_distance:' + repr(
             round(self.sensor_max_distance, 2)) + ')'
+
+    def get_saved_genome_repr(self):
+        return str(self.robot_wheel_radius) + ' ' + str(self.motor_ctrl_coefficient) + ' ' + \
+               str(self.motor_ctrl_min_actuator_value) + ' ' + str(self.sensor_delta_direction) + ' ' + \
+               str(self.sensor_saturation_value) + ' ' + str(self.sensor_max_distance) + ' ' + \
+               str(self.generation_num) + ' ' + str(self.fitness)

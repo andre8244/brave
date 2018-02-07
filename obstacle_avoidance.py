@@ -226,6 +226,8 @@ def decrease_scene_speed():
     print('scene.speed:', scene.speed)
 
 
+# todo se si caricano i genomi da un file, mostrare l'etichetta di ogni robot (linea nel file)
+
 # todo unire parti comuni con phototaxis in un unico file
 
 

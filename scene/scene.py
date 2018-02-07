@@ -1,10 +1,10 @@
-import time
 import pygame
 
 from geometry.point import Point
 from scene.wall import Wall
 from scene.box import Box
 from util.color import Color
+from util.time_util import TimeUtil
 
 
 class Scene:
@@ -17,7 +17,6 @@ class Scene:
         self.objects = []
         self.screen = pygame.display.set_mode((width + statistics_panel_width, height))
 
-
     def put(self, obj):
         if isinstance(obj, list):
             self.objects.extend(obj)
@@ -28,7 +27,7 @@ class Scene:
         self.objects.remove(obj)
 
     def save(self):
-        date_time = time.strftime("%Y-%m-%d_%H-%M-%S")
+        date_time = TimeUtil.format_date_time()
         file_name = "scene_" + date_time + ".txt"
         file_path = 'saved_scenes/' + file_name
 
@@ -40,7 +39,7 @@ class Scene:
                     line = obj.get_saved_scene_repr()
                     f.write(line + '\n')
                 else:
-                    print('Object unsaved:', obj)
+                    print('Object not saved:', obj)
         f.closed
         print('Scene saved:', file_path)
 
