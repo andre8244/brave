@@ -9,12 +9,14 @@ from util.color import Color
 
 class Scene:
 
-    def __init__(self, width, height, speed, screen):
+    def __init__(self, width, height, speed, statistics_panel_width=0):
         self.width = width
         self.height = height
         self.speed = speed
-        self.screen = screen
+        self.statistics_panel_width = statistics_panel_width
         self.objects = []
+        self.screen = pygame.display.set_mode((width + statistics_panel_width, height))
+
 
     def put(self, obj):
         if isinstance(obj, list):
@@ -56,8 +58,7 @@ class Scene:
                 if words[0] == 'Scene':
                     width = int(words[1])
                     height = int(words[2])
-                    screen = pygame.display.set_mode((width + statistics_panel_width, height))
-                    scene = Scene(width, height, scene_speed, screen)
+                    scene = Scene(width, height, scene_speed, statistics_panel_width)
                 # elif words[0] == 'SensorDrivenRobot':
                 #     x = float(words[1])
                 #     y = float(words[2])
@@ -86,4 +87,4 @@ class Scene:
                 line_number += 1
 
         f.closed
-        return scene, screen
+        return scene

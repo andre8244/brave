@@ -14,9 +14,11 @@ class SidePanel:
     DEFAULT_MARGIN = 45
     LEFT_MARGIN = 30
 
-    def __init__(self, scene, screen, population_num):
+    # todo display scene speed
+
+    def __init__(self, scene, population_num=0):
         self.scene = scene
-        self.screen = screen
+        self.screen = scene.screen
         self.population_num = population_num
         self.generation_num = None
         self.best_genome = None
@@ -39,7 +41,7 @@ class SidePanel:
         self.total_time_seconds = total_time_seconds
         self.generation_time_seconds = generation_time_seconds
 
-    def show_ga_statistics(self):
+    def display_ga_info(self):
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
@@ -70,6 +72,8 @@ class SidePanel:
             total_time = TimeUtil.format_time_seconds(self.total_time_seconds)
             generation_time = TimeUtil.format_time_seconds(self.generation_time_seconds)
 
+            # todo: draw vertical line on left border
+
             self.print_statistic(font, 'Generation: ' + str(self.generation_num))
             self.print_statistic(font, 'Population: ' + str(self.population_num))
             self.print_statistic(font, 'Total time: ' + total_time)
@@ -92,15 +96,34 @@ class SidePanel:
 
             self.print_statistic(font, 'Controls:')
             # todo:
-            # self.print_statistic(font, 'S : save evolution status to file', self.MARGIN_INDENTED)
-            self.print_statistic(font, 'R : restart evolution', self.LEFT_MARGIN)
+            # self.print_statistic(font, 'S : save evolution status to file', self.LEFT_MARGIN)
+            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
             self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
             self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
+
+    def display_info(self, object_to_place):
+        # todo: draw vertical line on left border
+
+        if pygame.font:
+            font = pygame.font.Font(None, self.FONT_SIZE)
+            self.line_num = 1
+
+            self.print_statistic(font, 'Controls:')
+            self.print_statistic(font, 'S : save current scene to file', self.LEFT_MARGIN)
+            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
+            self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, 'J : add a vehicle', self.LEFT_MARGIN)
+            self.print_statistic(font, 'K : remove a vehicle', self.LEFT_MARGIN)
+            self.print_statistic(font, 'Click left : place ' + object_to_place, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Click right : delete ' + object_to_place, self.LEFT_MARGIN)
+            self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
 
     def print_statistic(self, font, text, extra_margin=0):
-        line = font.render(text, 1, Color.WHITE)
-        x_pos = self.scene.width + self.DEFAULT_MARGIN + extra_margin
-        y_pos = self.line_num * self.line_spacing
-        lint_pos = pygame.Rect(x_pos, y_pos, 20, 20)
-        self.screen.blit(line, lint_pos)
-        self.line_num += 1
+            line = font.render(text, 1, Color.WHITE)
+            x_pos = self.scene.width + self.DEFAULT_MARGIN + extra_margin
+            y_pos = self.line_num * self.line_spacing
+            lint_pos = pygame.Rect(x_pos, y_pos, 20, 20)
+            self.screen.blit(line, lint_pos)
+            self.line_num += 1

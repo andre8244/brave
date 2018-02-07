@@ -16,7 +16,7 @@ DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
 DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
 DEFAULT_VERBOSE_VALUE = 0  # 0, 1, 2
 SCENE_MAX_SPEED = 3000
-STATISTICS_PANEL_WIDTH = 500
+STATISTICS_PANEL_WIDTH = 450
 
 scene = None
 screen = None
@@ -52,9 +52,9 @@ def initialize():
     global selection_ratio
     global verbose
 
-    scene, screen = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
-
-    side_panel = SidePanel(scene, screen, population_num)
+    scene = Scene.load_from_file(scene_path, scene_speed, STATISTICS_PANEL_WIDTH)
+    screen = scene.screen
+    side_panel = SidePanel(scene, population_num)
     engine = GaEngine(scene, side_panel, population_num, elitism_num, robot_random_direction, multicore,
                       obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose)
 
@@ -228,7 +228,7 @@ if __name__ == '__main__':
             if issubclass(type(obj), SensorDrivenRobot) and obj.label is not None:
                 obj.draw_label(screen)
 
-        side_panel.show_ga_statistics()
+        side_panel.display_ga_info()
 
         pygame.display.flip()
         int_scene_speed = int(round(scene.speed))

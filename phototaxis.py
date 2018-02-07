@@ -11,9 +11,12 @@ from scene.light import Light
 from sensor.light_sensor import LightSensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
+from util.side_panel import SidePanel
 
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
+STATISTICS_PANEL_WIDTH = 400
+
 ROBOT_SIZE = 30
 
 LIGHT_SENSOR_SATURATION_VALUE = 100
@@ -36,8 +39,10 @@ LIGHT_EMITTING_POWER_MIN = 10
 LIGHT_EMITTING_POWER_INTERVAL = 30
 
 scene = None
+screen = None
 robots = None
 lights = None
+side_panel = None
 
 
 def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
@@ -144,15 +149,18 @@ def remove_light_at_cursor():
             break
 
 
-def init_scene(screen):
+def initialize():
     global scene
     global robots
     global lights
+    global screen
+    global side_panel
 
     robots = []
     lights = []
-    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
-
+    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, STATISTICS_PANEL_WIDTH)
+    screen = scene.screen
+    side_panel = SidePanel(scene)
     add_robots(N_ROBOTS)
     create_lights(N_INITIAL_LIGHTS)
 
@@ -180,19 +188,18 @@ def decrease_scene_speed():
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption("Phototaxis - BRAVE")
-    screen = pygame.display.set_mode(SCREEN_SIZE)
+    initialize()
     clock = pygame.time.Clock()
-    init_scene(screen)
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
-                init_scene(screen)
-            elif event.type == KEYDOWN and event.key == K_k:
+                initialize()
+            elif event.type == KEYDOWN and event.key == K_j:
                 add_robots()
-            elif event.type == KEYDOWN and event.key == K_l:
+            elif event.type == KEYDOWN and event.key == K_k:
                 remove_robot()
             # elif event.type == KEYDOWN and event.key == K_COMMA:
             #     add_lights()
@@ -225,7 +232,8 @@ if __name__ == '__main__':
         for obj in scene.objects:
             obj.draw(screen)
 
+        side_panel.display_info('a light')
+
         pygame.display.flip()
         int_scene_speed = int(round(scene.speed))
         clock.tick(int_scene_speed)
-

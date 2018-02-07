@@ -13,9 +13,10 @@ from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 from geometry.point import Point
-
+from util.side_panel import SidePanel
 
 SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
+STATISTICS_PANEL_WIDTH = 400
 
 ROBOT_SIZE = 25
 ROBOT_WHEEL_SPEED_DELTA = 3
@@ -40,8 +41,10 @@ BOX_SIZE_MIN = 20
 BOX_SIZE_INTERVAL = 60
 
 scene = None
+screen = None
 robots = None
 obstacles = None
+side_panel = None
 
 
 def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
@@ -174,15 +177,18 @@ def add_walls(number_to_add=1):
 #     print('number of obstacles:', len(obstacles))
 
 
-def init_scene(screen):
+def initialize():
     global scene
     global robots
     global obstacles
+    global screen
+    global side_panel
 
     robots = []
     obstacles = []
-    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, screen)
-
+    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, STATISTICS_PANEL_WIDTH)
+    screen = scene.screen
+    side_panel = SidePanel(scene)
     add_robots(N_ROBOTS)
     create_boxes(N_INITIAL_BOXES)
     add_walls(N_INITIAL_WALLS)
@@ -220,22 +226,24 @@ def decrease_scene_speed():
     print('scene.speed:', scene.speed)
 
 
+# todo unire parti comuni con phototaxis in un unico file
+
+
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption("Obstacle avoidance - BRAVE")
-    screen = pygame.display.set_mode(SCREEN_SIZE)
+    initialize()
     clock = pygame.time.Clock()
-    init_scene(screen)
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_r:
-                init_scene(screen)
-            elif event.type == KEYDOWN and event.key == K_k:
+                initialize()
+            elif event.type == KEYDOWN and event.key == K_j:
                 add_robots()
-            elif event.type == KEYDOWN and event.key == K_l:
+            elif event.type == KEYDOWN and event.key == K_k:
                 remove_robot()
             # elif event.type == KEYDOWN and event.key == K_COMMA:
             #     add_boxes()
@@ -270,7 +278,8 @@ if __name__ == '__main__':
         for obj in scene.objects:
             obj.draw(screen)
 
+        side_panel.display_info('an obstacle')
+
         pygame.display.flip()
         int_scene_speed = int(round(scene.speed))
         clock.tick(int_scene_speed)
-
