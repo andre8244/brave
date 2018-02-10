@@ -38,8 +38,6 @@ class Scene:
                 if hasattr(obj, 'get_saved_scene_repr'):
                     line = obj.get_saved_scene_repr()
                     f.write(line + '\n')
-                else:
-                    print('Object not saved:', obj)
         f.closed
         print('Scene saved:', file_path)
 

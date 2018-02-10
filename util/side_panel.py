@@ -40,14 +40,14 @@ class SidePanel:
         self.generation_time_seconds = generation_time_seconds
 
     def display_ga_info(self):
-        pygame.draw.line(self.screen, Color.WHITE, (self.scene.width, 0), (self.scene.width, self.scene.height))
+        pygame.draw.line(self.screen, Color.GRAY, (self.scene.width, 0), (self.scene.width, self.scene.height))
 
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
 
             if self.best_genome is None:
-                # this happens only in the first generation
+                # this happens only at the first generation
                 fitness_best = '-'
                 generation_num_best = '-'
                 robot_wheel_radius_best = '-'
@@ -100,7 +100,7 @@ class SidePanel:
             self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
 
     def display_info(self, object_to_place):
-        pygame.draw.line(self.screen, Color.WHITE, (self.scene.width, 0), (self.scene.width, self.scene.height))
+        pygame.draw.line(self.screen, Color.GRAY, (self.scene.width, 0), (self.scene.width, self.scene.height))
 
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)

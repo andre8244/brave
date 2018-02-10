@@ -213,6 +213,8 @@ if __name__ == '__main__':
                 increase_scene_speed()
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
+            elif event.type == KEYDOWN and event.key == K_s:
+                scene.save()
 
         # teleport at the margins
         for robot in robots:

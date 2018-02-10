@@ -18,3 +18,6 @@ class Light(RotSurface):
                            int(round(self.size / 2)))
 
         super().__init__(x, y, 0, self.surf)
+
+    def get_saved_scene_repr(self):
+        return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y) + ' ' + str(self.emitting_power)
