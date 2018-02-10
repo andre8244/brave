@@ -7,11 +7,11 @@ from util.time_util import TimeUtil
 
 class SidePanel:
 
-    FONT_SIZE = 26
+    FONT_SIZE = 30
     LINE_SPACING_MIN = 25
-    LINE_SPACING_MAX = 45
+    LINE_SPACING_MAX = 35
     SCENE_HEIGHT_THRESHOLD = 700
-    DEFAULT_MARGIN = 45
+    DEFAULT_MARGIN = 35
     LEFT_MARGIN = 30
 
     def __init__(self, scene, population_num=0):
