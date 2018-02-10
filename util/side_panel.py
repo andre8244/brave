@@ -14,8 +14,6 @@ class SidePanel:
     DEFAULT_MARGIN = 45
     LEFT_MARGIN = 30
 
-    # todo display scene speed
-
     def __init__(self, scene, population_num=0):
         self.scene = scene
         self.screen = scene.screen
@@ -42,6 +40,8 @@ class SidePanel:
         self.generation_time_seconds = generation_time_seconds
 
     def display_ga_info(self):
+        pygame.draw.line(self.screen, Color.WHITE, (self.scene.width, 0), (self.scene.width, self.scene.height))
+
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
@@ -72,8 +72,6 @@ class SidePanel:
             total_time = TimeUtil.format_time_seconds(self.total_time_seconds)
             generation_time = TimeUtil.format_time_seconds(self.generation_time_seconds)
 
-            # todo: draw vertical line on left border
-
             self.print_statistic(font, 'Generation: ' + str(self.generation_num))
             self.print_statistic(font, 'Population: ' + str(self.population_num))
             self.print_statistic(font, 'Total time: ' + total_time)
@@ -95,15 +93,14 @@ class SidePanel:
             # controls
 
             self.print_statistic(font, 'Controls:')
-            # todo:
-            # self.print_statistic(font, 'S : save evolution status to file', self.LEFT_MARGIN)
+            self.print_statistic(font, 'S : save current genomes to file', self.LEFT_MARGIN)
             self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
             self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
             self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
             self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
 
     def display_info(self, object_to_place):
-        # todo: draw vertical line on left border
+        pygame.draw.line(self.screen, Color.WHITE, (self.scene.width, 0), (self.scene.width, self.scene.height))
 
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)

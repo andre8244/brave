@@ -319,20 +319,26 @@ class GaEngine:
         return Box(x, y, size, Color.random_bright())
 
     def save_genomes(self):
-        sorted_genomes = sorted(self.genomes_last_generation, key=lambda genome: genome.fitness, reverse=True)
+        if not self.genomes_last_generation:
+            # this hapeens at generation 1 only
+            genomes_to_save = self.genomes
+        else:
+            genomes_to_save = sorted(self.genomes_last_generation, key=lambda genome: genome.fitness, reverse=True)
+
         date_time = TimeUtil.format_date_time()
         file_name = "genomes_" + date_time + ".txt"
         file_path = 'saved_genomes/' + file_name
 
         with open(file_path, 'w') as f:
-            line1 = '# This is the structure of each line (generation_num and fitness values are ignored when a ' + \
-                    'genome file is loaded):'
-            line2 = '# robot_wheel_radius motor_ctrl_coefficient motor_ctrl_min_actuator_value ' +\
+            line1 = '# generation_num and fitness values are ignored when a genome file is loaded'
+            line2 = '# This is the structure of each line:'
+            line3 = '# robot_wheel_radius motor_ctrl_coefficient motor_ctrl_min_actuator_value ' +\
                     'sensor_delta_direction sensor_saturation_value sensor_max_distance generation_num fitness'
             f.write(line1 + '\n')
             f.write(line2 + '\n')
+            f.write(line3 + '\n')
 
-            for genome in sorted_genomes:
+            for genome in genomes_to_save:
                 line = genome.get_saved_genome_repr()
                 f.write(line + '\n')
         f.closed
