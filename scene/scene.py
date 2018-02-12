@@ -1,6 +1,7 @@
 import pygame
 
 from geometry.point import Point
+from scene.light import Light
 from scene.wall import Wall
 from scene.box import Box
 from util.color import Color
@@ -80,6 +81,13 @@ class Scene:
                     wall = Wall(point1, point2, Color.random_bright())
                     wall.label = line_number
                     scene.put(wall)
+                elif words[0] == 'Light':
+                    x = int(words[1])
+                    y = int(words[2])
+                    emitting_power = int(words[3])
+                    light = Light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
+                    light.label = line_number
+                    scene.put(light)
 
                 line_number += 1
 

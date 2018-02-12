@@ -2,6 +2,7 @@ import sys
 import pygame
 import math
 import random
+import util.cli_parser
 
 from pygame.locals import *
 from robot.sensor_driven_robot import SensorDrivenRobot
@@ -14,228 +15,202 @@ from robot.motor_controller import MotorController
 from util.side_panel import SidePanel
 
 
-SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
-STATISTICS_PANEL_WIDTH = 400
+class Phototaxis:
 
-ROBOT_SIZE = 30
+    SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
+    STATISTICS_PANEL_WIDTH = 400
 
-LIGHT_SENSOR_SATURATION_VALUE = 100
-LIGHT_SENSOR_ERROR = 0.1
+    ROBOT_SIZE = 30
 
-MOTOR_CONTROLLER_COEFFICIENT = 0.5
-MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
+    LIGHT_SENSOR_SATURATION_VALUE = 100
+    LIGHT_SENSOR_ERROR = 0.1
 
-SCREEN_MARGIN = ROBOT_SIZE / 2
+    MOTOR_CONTROLLER_COEFFICIENT = 0.5
+    MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-SCENE_SPEED_INITIAL = 25
+    SCREEN_MARGIN = ROBOT_SIZE / 2
 
-N_ROBOTS = 5
-N_INITIAL_LIGHTS = 0
+    SCENE_SPEED_INITIAL = 25
 
-PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
+    N_ROBOTS = 5
+    N_INITIAL_LIGHTS = 0
 
-LIGHT_EMITTING_POWER = 20
-LIGHT_EMITTING_POWER_MIN = 10
-LIGHT_EMITTING_POWER_INTERVAL = 30
+    PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
 
-scene = None
-screen = None
-robots = None
-lights = None
-side_panel = None
+    LIGHT_EMITTING_POWER = 20
+    LIGHT_EMITTING_POWER_MIN = 10
+    LIGHT_EMITTING_POWER_INTERVAL = 30
 
+    def __init__(self):
+        self.scene = None
+        self.screen = None
+        self.robots = None
+        self.lights = None
+        self.side_panel = None
+        self.scene_speed = None
+        self.scene_path = None
 
-def build_robot(x, y, robot_wheel_radius, light_sensor_direction):
-    global scene
-    global robots
+        self.parse_cli_arguments()
+        pygame.init()
+        pygame.display.set_caption("Phototaxis - BRAVE")
+        clock = pygame.time.Clock()
+        self.initialize()
 
-    robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                    sys.exit()
+                elif event.type == KEYDOWN and event.key == K_r:
+                    self.initialize()
+                elif event.type == KEYDOWN and event.key == K_j:
+                    self.add_robots()
+                elif event.type == KEYDOWN and event.key == K_k:
+                    self.remove_robot()
+                # elif event.type == KEYDOWN and event.key == K_COMMA:
+                #     add_lights()
+                elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    self.add_light_at_cursor()
+                # elif event.type == KEYDOWN and event.key == K_PERIOD:
+                #     remove_light()
+                elif event.type == MOUSEBUTTONDOWN and event.button == 3:
+                    self.remove_light_at_cursor()
+                elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
+                    self.increase_scene_speed()
+                elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
+                    self.decrease_scene_speed()
+                elif event.type == KEYDOWN and event.key == K_s:
+                    self.scene.save()
 
-    left_light_sensor = LightSensor(robot, light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
-    right_light_sensor = LightSensor(robot, -light_sensor_direction, LIGHT_SENSOR_SATURATION_VALUE, LIGHT_SENSOR_ERROR, scene)
-    left_wheel_actuator = Actuator()
-    right_wheel_actuator = Actuator()
+            # teleport at the margins
+            for robot in self.robots:
+                robot.sense_and_act()
 
-    if PHOTOTAXIS:
-        left_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                                MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-        right_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                                 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-    else:
-        # ANTI-PHOTOTAXIS
-        left_motor_controller = MotorController(left_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                                MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-        right_motor_controller = MotorController(right_light_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                                 MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+                if robot.x < -self.SCREEN_MARGIN:
+                    robot.x = self.scene.width + self.SCREEN_MARGIN
+                if robot.x > self.scene.width + self.SCREEN_MARGIN:
+                    robot.x = -self.SCREEN_MARGIN
+                if robot.y < -self.SCREEN_MARGIN:
+                    robot.y = self.scene.height + self.SCREEN_MARGIN
+                if robot.y > self.scene.height + self.SCREEN_MARGIN:
+                    robot.y = -self.SCREEN_MARGIN
 
-    robot.set_left_motor_controller(left_motor_controller)
-    robot.set_right_motor_controller(right_motor_controller)
+            self.screen.fill(Color.BLACK)
 
-    robots.append(robot)
-    return robot
+            for obj in self.scene.objects:
+                obj.draw(self.screen)
 
+            self.side_panel.display_info('a light')
 
-def build_light(x, y, emitting_power, color_fg, color_bg):
-    global lights
-    light = Light(x, y, emitting_power, color_fg, color_bg)
-    lights.append(light)
-    return light
+            pygame.display.flip()
+            int_scene_speed = int(round(self.scene.speed))
+            clock.tick(int_scene_speed)
 
+    def build_robot(self, x, y, robot_wheel_radius, light_sensor_direction):
+        robot = SensorDrivenRobot(x, y, self.ROBOT_SIZE, robot_wheel_radius)
 
-def add_robots(number_to_add=1):
-    global scene
-    global robots
+        left_light_sensor = LightSensor(robot, light_sensor_direction, self.LIGHT_SENSOR_SATURATION_VALUE, self.LIGHT_SENSOR_ERROR, self.scene)
+        right_light_sensor = LightSensor(robot, -light_sensor_direction, self.LIGHT_SENSOR_SATURATION_VALUE, self.LIGHT_SENSOR_ERROR, self.scene)
+        left_wheel_actuator = Actuator()
+        right_wheel_actuator = Actuator()
 
-    for i in range(number_to_add):
-        x = random.randint(0, SCREEN_WIDTH)
-        y = random.randint(0, SCREEN_HEIGHT)
-        robot = build_robot(x, y, 10, math.pi / 4)
-        scene.put(robot)
-    # print('number of robots:', len(robots))
+        if self.PHOTOTAXIS:
+            left_motor_controller = MotorController(right_light_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
+                                                    self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+            right_motor_controller = MotorController(left_light_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
+                                                     self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+        else:
+            # ANTI-PHOTOTAXIS
+            left_motor_controller = MotorController(left_light_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
+                                                    self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+            right_motor_controller = MotorController(right_light_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
+                                                     self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
 
+        robot.set_left_motor_controller(left_motor_controller)
+        robot.set_right_motor_controller(right_motor_controller)
 
-def remove_robot():
-    global scene
-    global robots
+        self.robots.append(robot)
+        return robot
 
-    if len(robots) > 0:
-        scene.remove(robots.pop(0))
-    # print('number of robots:', len(robots))
+    def build_light(self, x, y, emitting_power, color_fg, color_bg):
+        light = Light(x, y, emitting_power, color_fg, color_bg)
+        self.lights.append(light)
+        return light
 
+    def add_robots(self, number_to_add=1):
+        for i in range(number_to_add):
+            x = random.randint(0, self.SCREEN_WIDTH)
+            y = random.randint(0, self.SCREEN_HEIGHT)
+            robot = self.build_robot(x, y, 10, math.pi / 4)
+            self.scene.put(robot)
+        # print('number of robots:', len(robots))
 
-def create_lights(number_to_add=1):
-    global scene
-    global lights
+    def remove_robot(self):
+        if len(self.robots) > 0:
+            self.scene.remove(self.robots.pop(0))
+        # print('number of robots:', len(robots))
 
-    for i in range(number_to_add):
-        x = random.randint(0, SCREEN_WIDTH)
-        y = random.randint(0, SCREEN_HEIGHT)
-        emitting_power = random.randint(LIGHT_EMITTING_POWER_MIN, LIGHT_EMITTING_POWER_INTERVAL)
-        light = build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
-        scene.put(light)
-    # print('number of lights:', len(lights))
+    def create_lights(self, number_to_add=1):
+        for i in range(number_to_add):
+            x = random.randint(0, self.SCREEN_WIDTH)
+            y = random.randint(0, self.SCREEN_HEIGHT)
+            emitting_power = random.randint(self.LIGHT_EMITTING_POWER_MIN, self.LIGHT_EMITTING_POWER_INTERVAL)
+            light = self.build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
+            self.scene.put(light)
+        # print('number of lights:', len(lights))
 
+    def add_light_at_cursor(self):
+        x, y = pygame.mouse.get_pos()
+        light = self.build_light(x, y, self.LIGHT_EMITTING_POWER, Color.YELLOW, Color.BLACK)
+        self.scene.put(light)
+        # print('number of lights:', len(lights))
 
-def add_light_at_cursor():
-    global scene
-    global lights
+    def remove_light_at_cursor(self):
+        # global scene
+        # global lights
 
-    x, y = pygame.mouse.get_pos()
-    light = build_light(x, y, LIGHT_EMITTING_POWER, Color.YELLOW, Color.BLACK)
-    scene.put(light)
-    # print('number of lights:', len(lights))
+        x, y = pygame.mouse.get_pos()
 
+        for light in self.lights:
+            if x <= light.x + (light.size / 2) and x >= light.x - (light.size / 2) and y <= light.y + (
+                    light.size / 2) and y >= light.y - (light.size / 2):
+                self.scene.remove(light)
+                self.lights.remove(light)
+                break
 
-# def remove_light():
-#     global scene
-#     global lights
-#
-#     if len(lights) > 0:
-#         scene.remove(lights.pop(0))
-#     print('number of lights:', len(lights))
+    def initialize(self):
+        self.robots = []
+        self.lights = []
+        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.STATISTICS_PANEL_WIDTH)
+        self.screen = self.scene.screen
+        self.side_panel = SidePanel(self.scene)
+        self.add_robots(self.N_ROBOTS)
+        self.create_lights(self.N_INITIAL_LIGHTS)
 
+        # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
+        # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
+        # build_light(100, 450, 30, Color.YELLOW, Color.BLACK)
+        # build_light(60, 100, 20, Color.YELLOW, Color.BLACK)
+        #
+        # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
+        # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
-def remove_light_at_cursor():
-    global scene
-    global lights
+    def increase_scene_speed(self):
+        if self.scene.speed < 200:
+            self.scene.speed *= 1.5
+        print('Scene speed:', self.scene.speed)
 
-    x, y = pygame.mouse.get_pos()
+    def decrease_scene_speed(self):
+        if self.scene.speed > 1:
+            self.scene.speed /= 1.5
+        print('Scene speed:', self.scene.speed)
 
-    for light in lights:
-        if x <= light.x + (light.size / 2) and x >= light.x - (light.size / 2) and y <= light.y + (
-                light.size / 2) and y >= light.y - (light.size / 2):
-            scene.remove(light)
-            lights.remove(light)
-            break
+    def parse_cli_arguments(self):
+        parser = util.cli_parser.CliParser()
+        parser.parse_args(False)
 
-
-def initialize():
-    global scene
-    global robots
-    global lights
-    global screen
-    global side_panel
-
-    robots = []
-    lights = []
-    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, STATISTICS_PANEL_WIDTH)
-    screen = scene.screen
-    side_panel = SidePanel(scene)
-    add_robots(N_ROBOTS)
-    create_lights(N_INITIAL_LIGHTS)
-
-    # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
-    # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
-    # build_light(100, 450, 30, Color.YELLOW, Color.BLACK)
-    # build_light(60, 100, 20, Color.YELLOW, Color.BLACK)
-    #
-    # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
-    # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
-
-
-def increase_scene_speed():
-    if scene.speed < 200:
-        scene.speed *= 1.5
-    print('Scene speed:', scene.speed)
-
-
-def decrease_scene_speed():
-    if scene.speed > 1:
-        scene.speed /= 1.5
-    print('Scene speed:', scene.speed)
+        self.scene_speed = parser.scene_speed
+        self.scene_path = parser.scene_path
 
 
 if __name__ == '__main__':
-    pygame.init()
-    pygame.display.set_caption("Phototaxis - BRAVE")
-    initialize()
-    clock = pygame.time.Clock()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-                sys.exit()
-            elif event.type == KEYDOWN and event.key == K_r:
-                initialize()
-            elif event.type == KEYDOWN and event.key == K_j:
-                add_robots()
-            elif event.type == KEYDOWN and event.key == K_k:
-                remove_robot()
-            # elif event.type == KEYDOWN and event.key == K_COMMA:
-            #     add_lights()
-            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-                add_light_at_cursor()
-            # elif event.type == KEYDOWN and event.key == K_PERIOD:
-            #     remove_light()
-            elif event.type == MOUSEBUTTONDOWN and event.button == 3:
-                remove_light_at_cursor()
-            elif event.type == KEYDOWN and (event.key == K_PLUS or event.key == 93 or event.key == 270):
-                increase_scene_speed()
-            elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
-                decrease_scene_speed()
-            elif event.type == KEYDOWN and event.key == K_s:
-                scene.save()
-
-        # teleport at the margins
-        for robot in robots:
-            robot.sense_and_act()
-
-            if robot.x < -SCREEN_MARGIN:
-                robot.x = SCREEN_WIDTH + SCREEN_MARGIN
-            if robot.x > SCREEN_WIDTH + SCREEN_MARGIN:
-                robot.x = -SCREEN_MARGIN
-            if robot.y < -SCREEN_MARGIN:
-                robot.y = SCREEN_HEIGHT + SCREEN_MARGIN
-            if robot.y > SCREEN_HEIGHT + SCREEN_MARGIN:
-                robot.y = -SCREEN_MARGIN
-
-        screen.fill(Color.BLACK)
-
-        for obj in scene.objects:
-            obj.draw(screen)
-
-        side_panel.display_info('a light')
-
-        pygame.display.flip()
-        int_scene_speed = int(round(scene.speed))
-        clock.tick(int_scene_speed)
+    Phototaxis()

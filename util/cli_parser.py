@@ -62,6 +62,9 @@ class CliParser:
 
         args = parser.parse_args()
 
+        self.scene_path = EvolutionObstacleAvoidance.DEFAULT_SCENE_PATH if args.scene is None else args.scene
+        self.scene_speed = EvolutionObstacleAvoidance.DEFAULT_SCENE_SPEED if args.fps is None else args.fps
+
         if add_ga_args:
             self.elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite
             self.population_num = GaEngine.DEFAULT_POPULATION_NUM if args.population is None else args.population
@@ -73,21 +76,22 @@ class CliParser:
             self.multicore = args.multicore
             self.verbose = EvolutionObstacleAvoidance.DEFAULT_VERBOSE_VALUE if args.verbose is None else args.verbose
 
-        self.scene_path = EvolutionObstacleAvoidance.DEFAULT_SCENE_PATH if args.scene is None else args.scene
-        self.scene_speed = EvolutionObstacleAvoidance.DEFAULT_SCENE_SPEED if args.fps is None else args.fps
-
         # check parameters value
-        if self.elitism_num < 0:
-            raise ValueError('Elite argument must be >= 0')
 
-        if self.population_num < 2:
-            raise ValueError('Population argument must be >= 2')
-
-        if self.population_num <= self.elitism_num:
-            raise ValueError('Population argument (' + str(self.population_num) + ') must be > elite argument (' +
-                             str(self.elitism_num) + ')')
+        if self.scene_speed < 0:
+            raise ValueError('FPS argument must be >= 0')
 
         if add_ga_args:
+            if self.elitism_num < 0:
+                raise ValueError('Elite argument must be >= 0')
+
+            if self.population_num < 2:
+                raise ValueError('Population argument must be >= 2')
+
+            if self.population_num <= self.elitism_num:
+                raise ValueError('Population argument (' + str(self.population_num) + ') must be > elite argument (' +
+                                 str(self.elitism_num) + ')')
+
             if self.obstacle_sensor_error < 0:
                 raise ValueError('Sensor error argument must be >= 0')
 
@@ -104,6 +108,3 @@ class CliParser:
                 raise ValueError('The number of parents selected to breed a new generation is < 2. ' +
                                  'Please increase population (' + str(self.population_num) + ') or selection ratio (' +
                                  str(self.selection_ratio) + ')')
-
-        if self.scene_speed < 0:
-            raise ValueError('FPS argument must be >= 0')
