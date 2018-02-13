@@ -33,10 +33,11 @@ class Phototaxis:
     DEFAULT_SCENE_SPEED = 30
     SCENE_MAX_SPEED = 200
     SCENE_MIN_SPEED = 1
+    SCENE_SPEED_CHANGE_COEFF = 1.5
 
     ROBOT_SIZE = 30
     SCREEN_MARGIN = ROBOT_SIZE / 2
-    STATISTICS_PANEL_WIDTH = 400
+    SIDE_PANEL_WIDTH = 400
 
     LIGHT_EMITTING_POWER_MIN = 10
     LIGHT_EMITTING_POWER_INTERVAL = 30
@@ -177,7 +178,7 @@ class Phototaxis:
     def initialize(self):
         self.robots = []
         self.lights = []
-        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.STATISTICS_PANEL_WIDTH)
+        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene)
         self.add_robots(self.N_ROBOTS)
@@ -185,12 +186,12 @@ class Phototaxis:
 
     def increase_scene_speed(self):
         if self.scene.speed < self.SCENE_MAX_SPEED:
-            self.scene.speed *= 1.5
+            self.scene.speed *= self.SCENE_SPEED_CHANGE_COEFF
         print('Scene speed:', self.scene.speed)
 
     def decrease_scene_speed(self):
         if self.scene.speed > self.SCENE_MIN_SPEED:
-            self.scene.speed /= 1.5
+            self.scene.speed /= self.SCENE_SPEED_CHANGE_COEFF
         print('Scene speed:', self.scene.speed)
 
     def parse_cli_arguments(self):
