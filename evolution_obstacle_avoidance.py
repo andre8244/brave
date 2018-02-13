@@ -14,7 +14,7 @@ from util.time_util import TimeUtil
 
 class EvolutionObstacleAvoidance:
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/boxes_900.txt'
+    DEFAULT_SCENE_PATH = 'saved_scenes/obstacle_avoidance_900.txt'
     DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
     DEFAULT_VERBOSE_VALUE = 0  # 0, 1, 2
     SCENE_MAX_SPEED = 3000
@@ -100,7 +100,7 @@ class EvolutionObstacleAvoidance:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(True)
+        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, True)
 
         self.elitism_num = parser.elitism_num
         self.population_num = parser.population_num

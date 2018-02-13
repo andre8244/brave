@@ -15,218 +15,210 @@ from robot.motor_controller import MotorController
 from geometry.point import Point
 from util.side_panel import SidePanel
 
-SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
-STATISTICS_PANEL_WIDTH = 400
 
-ROBOT_SIZE = 25
-ROBOT_WHEEL_SPEED_DELTA = 3
+class ObstacleAvoidance:
 
-OBSTACLE_SENSOR_MAX_DISTANCE = 100
-OBSTACLE_SENSOR_SATURATION_VALUE = 50
-OBSTACLE_SENSOR_ERROR = 0.1
+    # todo riordinare
 
-MOTOR_CONTROLLER_COEFFICIENT = 300
-MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
+    STATISTICS_PANEL_WIDTH = 400
 
-SCREEN_MARGIN = ROBOT_SIZE / 2
+    ROBOT_SIZE = 25
+    ROBOT_WHEEL_SPEED_DELTA = 3
 
-SCENE_SPEED_INITIAL = 25
+    OBSTACLE_SENSOR_MAX_DISTANCE = 100
+    OBSTACLE_SENSOR_SATURATION_VALUE = 50
+    OBSTACLE_SENSOR_ERROR = 0.1
 
-N_ROBOTS = 10
-N_INITIAL_BOXES = 0
-N_INITIAL_WALLS = 0
+    MOTOR_CONTROLLER_COEFFICIENT = 300
+    MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-BOX_SIZE = 40
-BOX_SIZE_MIN = 20
-BOX_SIZE_INTERVAL = 60
+    SCREEN_MARGIN = ROBOT_SIZE / 2
 
-scene = None
-screen = None
-robots = None
-obstacles = None
-side_panel = None
+    DEFAULT_SCENE_PATH = 'saved_scenes/empty_scene_700.txt'
+    DEFAULT_SCENE_SPEED = 30
+    SCENE_MAX_SPEED = 200
+    SCENE_MIN_SPEED = 1
 
+    N_ROBOTS = 10
+    N_INITIAL_BOXES = 0
+    N_INITIAL_WALLS = 0
 
-def build_robot(x, y, robot_wheel_radius, obstacle_sensor_direction):
-    global scene
-    global robots
+    BOX_SIZE = 40
+    BOX_SIZE_MIN = 20
+    BOX_SIZE_INTERVAL = 60
 
-    robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
+    def __init__(self):
+        self.scene = None
+        self.screen = None
+        self.robots = None
+        self.obstacles = None
+        self.side_panel = None
 
-    left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
-                                           OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
-    right_obstacle_sensor = ProximitySensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
-                                            OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
-    left_wheel_actuator = Actuator()
-    right_wheel_actuator = Actuator()
-    left_motor_controller = MotorController(left_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                            MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-    right_motor_controller = MotorController(right_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                             MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+        def build_robot(self, x, y, robot_wheel_radius, obstacle_sensor_direction):
+            global scene
+            global robots
 
-    robot.set_left_motor_controller(left_motor_controller)
-    robot.set_right_motor_controller(right_motor_controller)
+            robot = SensorDrivenRobot(x, y, ROBOT_SIZE, robot_wheel_radius)
 
-    robots.append(robot)
-    return robot
+            left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+                                                   OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
+            right_obstacle_sensor = ProximitySensor(robot, -obstacle_sensor_direction, OBSTACLE_SENSOR_SATURATION_VALUE,
+                                                    OBSTACLE_SENSOR_ERROR, OBSTACLE_SENSOR_MAX_DISTANCE, scene)
+            left_wheel_actuator = Actuator()
+            right_wheel_actuator = Actuator()
+            left_motor_controller = MotorController(left_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
+                                                    MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+            right_motor_controller = MotorController(right_obstacle_sensor, MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
+                                                     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
 
+            robot.set_left_motor_controller(left_motor_controller)
+            robot.set_right_motor_controller(right_motor_controller)
 
-def build_box(x, y, size, color):
-    global obstacles
+            robots.append(robot)
+            return robot
 
-    box = Box(x, y, size, color)
-    obstacles.append(box)
-    return box
+        def build_box(self, x, y, size, color):
+            global obstacles
 
+            box = Box(x, y, size, color)
+            obstacles.append(box)
+            return box
 
-def build_wall(point1, point2, color):
-    global obstacles
+        def build_wall(self, point1, point2, color):
+            global obstacles
 
-    wall = Wall(point1, point2, color)
-    obstacles.append(wall)
-    return wall
+            wall = Wall(point1, point2, color)
+            obstacles.append(wall)
+            return wall
 
+        def add_robots(self, number_to_add=1):
+            global scene
+            global robots
 
-def add_robots(number_to_add=1):
-    global scene
-    global robots
+            for i in range(number_to_add):
+                x = random.randint(0, SCREEN_WIDTH)
+                y = random.randint(0, SCREEN_HEIGHT)
+                robot = build_robot(x, y, 10, math.pi / 8)
+                scene.put(robot)
+            print('number of robots:', len(robots))
 
-    for i in range(number_to_add):
-        x = random.randint(0, SCREEN_WIDTH)
-        y = random.randint(0, SCREEN_HEIGHT)
-        robot = build_robot(x, y, 10, math.pi / 8)
-        scene.put(robot)
-    print('number of robots:', len(robots))
+        def remove_robot(self):
+            global scene
+            global robots
 
+            if len(robots) > 0:
+                scene.remove(robots.pop(0))
+            print('number of robots:', len(robots))
 
-def remove_robot():
-    global scene
-    global robots
+        def create_boxes(self, number_to_add=1):
+            global scene
+            global obstacles
 
-    if len(robots) > 0:
-        scene.remove(robots.pop(0))
-    print('number of robots:', len(robots))
+            for i in range(number_to_add):
+                x = random.randint(0, SCREEN_WIDTH)
+                y = random.randint(0, SCREEN_HEIGHT)
 
+                size = random.randint(BOX_SIZE_MIN, BOX_SIZE_INTERVAL)
+                box = build_box(x, y, size, Color.random_bright())
+                scene.put(box)
 
-def create_boxes(number_to_add=1):
-    global scene
-    global obstacles
+            print('number of obstacles:', len(obstacles))
 
-    for i in range(number_to_add):
-        x = random.randint(0, SCREEN_WIDTH)
-        y = random.randint(0, SCREEN_HEIGHT)
+        def add_box_at_cursor(self):
+            global scene
+            global obstacles
 
-        size = random.randint(BOX_SIZE_MIN, BOX_SIZE_INTERVAL)
-        box = build_box(x, y, size, Color.random_bright())
-        scene.put(box)
+            x, y = pygame.mouse.get_pos()
+            box = build_box(x, y, BOX_SIZE, Color.random_bright())
+            scene.put(box)
 
-    print('number of obstacles:', len(obstacles))
+        def remove_box_at_cursor(self):
+            global scene
+            global obstacles
 
+            x, y = pygame.mouse.get_pos()
 
-def add_box_at_cursor():
-    global scene
-    global obstacles
+            for obstacle in obstacles:
+                if issubclass(type(obstacle), Box):
+                    box = obstacle
 
-    x, y = pygame.mouse.get_pos()
-    box = build_box(x, y, BOX_SIZE, Color.random_bright())
-    scene.put(box)
+                    if x <= box.x + (box.size / 2) and x >= box.x - (box.size / 2) and y <= box.y + (
+                            box.size / 2) and y >= box.y - (box.size / 2):
+                        scene.remove(box)
+                        obstacles.remove(box)
+                        break
 
+        def add_walls(self, number_to_add=1):
+            global scene
+            global obstacles
 
-def remove_box_at_cursor():
-    global scene
-    global obstacles
+            for i in range(number_to_add):
+                x1 = random.randint(0, SCREEN_WIDTH)
+                y1 = random.randint(0, SCREEN_HEIGHT)
+                point1 = Point(x1, y1)
 
-    x, y = pygame.mouse.get_pos()
+                x2 = random.randint(0, SCREEN_WIDTH)
+                y2 = random.randint(0, SCREEN_HEIGHT)
+                point2 = Point(x2, y2)
 
-    for obstacle in obstacles:
-        if issubclass(type(obstacle), Box):
-            box = obstacle
+                wall = build_wall(point1, point2, Color.random_color(127, 127, 127))
+                scene.put(wall)
 
-            if x <= box.x + (box.size / 2) and x >= box.x - (box.size / 2) and y <= box.y + (
-                    box.size / 2) and y >= box.y - (box.size / 2):
-                scene.remove(box)
-                obstacles.remove(box)
-                break
+            print('number of obstacles:', len(obstacles))
 
+        # def remove_box():
+        #     global scene
+        #     global obstacles
+        #
+        #     if len(obstacles) > 0:
+        #         scene.remove(obstacles.pop(0))
+        #     print('number of obstacles:', len(obstacles))
 
-def add_walls(number_to_add=1):
-    global scene
-    global obstacles
+        def initialize(self):
+            global scene
+            global robots
+            global obstacles
+            global screen
+            global side_panel
 
-    for i in range(number_to_add):
-        x1 = random.randint(0, SCREEN_WIDTH)
-        y1 = random.randint(0, SCREEN_HEIGHT)
-        point1 = Point(x1, y1)
+            robots = []
+            obstacles = []
+            scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, STATISTICS_PANEL_WIDTH)
+            screen = scene.screen
+            side_panel = SidePanel(scene)
+            add_robots(N_ROBOTS)
+            create_boxes(N_INITIAL_BOXES)
+            add_walls(N_INITIAL_WALLS)
 
-        x2 = random.randint(0, SCREEN_WIDTH)
-        y2 = random.randint(0, SCREEN_HEIGHT)
-        point2 = Point(x2, y2)
+            # wall = Wall(Point(0,0), Point(300, 500), Color.YELLOW)
+            # scene.put(wall)
 
-        wall = build_wall(point1, point2, Color.random_color(127, 127, 127))
-        scene.put(wall)
+            # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
+            # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
 
-    print('number of obstacles:', len(obstacles))
+            # build_robot(400, 300, 10, math.pi / 4)
+            # robots[0].direction = 0
 
+            # build_box(550, 280, 100, Color.YELLOW)
+            # build_box(450, 220, 60, Color.YELLOW)
 
-# def remove_box():
-#     global scene
-#     global obstacles
-#
-#     if len(obstacles) > 0:
-#         scene.remove(obstacles.pop(0))
-#     print('number of obstacles:', len(obstacles))
+            # commentare in caso di robot generati casualmente
+            # scene.put(robots)
+            # scene.put(boxes)
 
+        def increase_scene_speed(self):
+            global scene
 
-def initialize():
-    global scene
-    global robots
-    global obstacles
-    global screen
-    global side_panel
+            if scene.speed < 200:
+                scene.speed *= 1.5
+            print('scene.speed:', scene.speed)
 
-    robots = []
-    obstacles = []
-    scene = Scene(SCREEN_WIDTH, SCREEN_HEIGHT, SCENE_SPEED_INITIAL, STATISTICS_PANEL_WIDTH)
-    screen = scene.screen
-    side_panel = SidePanel(scene)
-    add_robots(N_ROBOTS)
-    create_boxes(N_INITIAL_BOXES)
-    add_walls(N_INITIAL_WALLS)
+        def decrease_scene_speed(self):
+            global scene
 
-    # wall = Wall(Point(0,0), Point(300, 500), Color.YELLOW)
-    # scene.put(wall)
-
-    # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
-    # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
-
-    # build_robot(400, 300, 10, math.pi / 4)
-    # robots[0].direction = 0
-
-    # build_box(550, 280, 100, Color.YELLOW)
-    # build_box(450, 220, 60, Color.YELLOW)
-
-    # commentare in caso di robot generati casualmente
-    # scene.put(robots)
-    # scene.put(boxes)
-
-
-def increase_scene_speed():
-    global scene
-
-    if scene.speed < 200:
-        scene.speed *= 1.5
-    print('scene.speed:', scene.speed)
-
-
-def decrease_scene_speed():
-    global scene
-
-    if scene.speed > 1:
-        scene.speed /= 1.5
-    print('scene.speed:', scene.speed)
-
-
-# todo se si caricano i genomi da un file, mostrare l'etichetta di ogni robot (linea nel file)
+            if scene.speed > 1:
+                scene.speed /= 1.5
+            print('scene.speed:', scene.speed)
 
 
 if __name__ == '__main__':
@@ -258,7 +250,7 @@ if __name__ == '__main__':
             elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                 decrease_scene_speed()
             elif event.type == KEYDOWN and event.key == K_s:
-                scene.save()
+                scene.save('obstacle_avoidance_scene')
 
         # teleport at the margins
         for robot in robots:

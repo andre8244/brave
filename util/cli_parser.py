@@ -19,7 +19,7 @@ class CliParser:
         self.scene_path = None
         self.scene_speed = None
 
-    def parse_args(self, add_ga_args):
+    def parse_args(self, default_scene_path, default_scene_speed, add_ga_args):
         parser = argparse.ArgumentParser()
 
         if add_ga_args:
@@ -53,17 +53,17 @@ class CliParser:
 
             parser.add_argument('-c', '--multicore', help='Enable multicore support (experimental)', action="store_true")
 
-        parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + EvolutionObstacleAvoidance.DEFAULT_SCENE_PATH,
+        parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + default_scene_path,
                             metavar='FILE')
 
         parser.add_argument('-f', '--fps',
-                            help='Number of frames per second (0 = maximum fps). Default: ' + str(EvolutionObstacleAvoidance.DEFAULT_SCENE_SPEED),
+                            help='Number of frames per second (0 = maximum fps). Default: ' + str(default_scene_speed),
                             type=int, metavar='NUM')
 
         args = parser.parse_args()
 
-        self.scene_path = EvolutionObstacleAvoidance.DEFAULT_SCENE_PATH if args.scene is None else args.scene
-        self.scene_speed = EvolutionObstacleAvoidance.DEFAULT_SCENE_SPEED if args.fps is None else args.fps
+        self.scene_path = default_scene_path if args.scene is None else args.scene
+        self.scene_speed = default_scene_speed if args.fps is None else args.fps
 
         if add_ga_args:
             self.elitism_num = GaEngine.DEFAULT_ELITISM_NUM if args.elite is None else args.elite

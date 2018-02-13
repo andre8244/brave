@@ -17,10 +17,11 @@ from util.side_panel import SidePanel
 
 class Phototaxis:
 
-    SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
-    STATISTICS_PANEL_WIDTH = 400
+    N_ROBOTS = 5
+    N_INITIAL_LIGHTS = 0
 
-    ROBOT_SIZE = 30
+    PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
+    LIGHT_EMITTING_POWER = 20
 
     LIGHT_SENSOR_SATURATION_VALUE = 100
     LIGHT_SENSOR_ERROR = 0.1
@@ -28,16 +29,15 @@ class Phototaxis:
     MOTOR_CONTROLLER_COEFFICIENT = 0.5
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
+    DEFAULT_SCENE_PATH = 'saved_scenes/empty_scene_700.txt'
+    DEFAULT_SCENE_SPEED = 30
+    SCENE_MAX_SPEED = 200
+    SCENE_MIN_SPEED = 1
+
+    ROBOT_SIZE = 30
     SCREEN_MARGIN = ROBOT_SIZE / 2
+    STATISTICS_PANEL_WIDTH = 400
 
-    SCENE_SPEED_INITIAL = 25
-
-    N_ROBOTS = 5
-    N_INITIAL_LIGHTS = 0
-
-    PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
-
-    LIGHT_EMITTING_POWER = 20
     LIGHT_EMITTING_POWER_MIN = 10
     LIGHT_EMITTING_POWER_INTERVAL = 30
 
@@ -79,7 +79,7 @@ class Phototaxis:
                 elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                     self.decrease_scene_speed()
                 elif event.type == KEYDOWN and event.key == K_s:
-                    self.scene.save()
+                    self.scene.save('phototaxis_scene')
 
             # teleport at the margins
             for robot in self.robots:
@@ -138,8 +138,8 @@ class Phototaxis:
 
     def add_robots(self, number_to_add=1):
         for i in range(number_to_add):
-            x = random.randint(0, self.SCREEN_WIDTH)
-            y = random.randint(0, self.SCREEN_HEIGHT)
+            x = random.randint(0, self.scene.width)
+            y = random.randint(0, self.scene.height)
             robot = self.build_robot(x, y, 10, math.pi / 4)
             self.scene.put(robot)
         # print('number of robots:', len(robots))
@@ -151,8 +151,8 @@ class Phototaxis:
 
     def create_lights(self, number_to_add=1):
         for i in range(number_to_add):
-            x = random.randint(0, self.SCREEN_WIDTH)
-            y = random.randint(0, self.SCREEN_HEIGHT)
+            x = random.randint(0, self.scene.width)
+            y = random.randint(0, self.scene.height)
             emitting_power = random.randint(self.LIGHT_EMITTING_POWER_MIN, self.LIGHT_EMITTING_POWER_INTERVAL)
             light = self.build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
             self.scene.put(light)
@@ -165,9 +165,6 @@ class Phototaxis:
         # print('number of lights:', len(lights))
 
     def remove_light_at_cursor(self):
-        # global scene
-        # global lights
-
         x, y = pygame.mouse.get_pos()
 
         for light in self.lights:
@@ -186,27 +183,19 @@ class Phototaxis:
         self.add_robots(self.N_ROBOTS)
         self.create_lights(self.N_INITIAL_LIGHTS)
 
-        # build_light(600, 200, 20, Color.YELLOW, Color.BLACK)
-        # build_light(700, 250, 10, Color.YELLOW, Color.BLACK)
-        # build_light(100, 450, 30, Color.YELLOW, Color.BLACK)
-        # build_light(60, 100, 20, Color.YELLOW, Color.BLACK)
-        #
-        # build_robot(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, math.pi / 4)
-        # build_robot(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 3, 20, math.pi / 2)
-
     def increase_scene_speed(self):
-        if self.scene.speed < 200:
+        if self.scene.speed < self.SCENE_MAX_SPEED:
             self.scene.speed *= 1.5
         print('Scene speed:', self.scene.speed)
 
     def decrease_scene_speed(self):
-        if self.scene.speed > 1:
+        if self.scene.speed > self.SCENE_MIN_SPEED:
             self.scene.speed /= 1.5
         print('Scene speed:', self.scene.speed)
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(False)
+        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, False)
 
         self.scene_speed = parser.scene_speed
         self.scene_path = parser.scene_path

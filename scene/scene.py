@@ -27,9 +27,9 @@ class Scene:
     def remove(self, obj):
         self.objects.remove(obj)
 
-    def save(self):
+    def save(self, filename_pattern='scene'):
         date_time = TimeUtil.format_date_time()
-        file_name = "scene_" + date_time + ".txt"
+        file_name = filename_pattern + '_' + date_time + ".txt"
         file_path = 'saved_scenes/' + file_name
 
         with open(file_path, 'w') as f:

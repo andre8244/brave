@@ -24,11 +24,7 @@ class SidePanel:
         self.total_time_seconds = None
         self.generation_time_seconds = None
         self.line_num = None
-
-        if scene.height > self.SCENE_HEIGHT_THRESHOLD:
-            self.line_spacing = self.LINE_SPACING_MAX
-        else:
-            self.line_spacing = self.LINE_SPACING_MIN
+        self.line_spacing = None
 
     def update_ga_data(self, generation_num, best_genome, fitness_best_genome):
         self.generation_num = generation_num
@@ -45,6 +41,11 @@ class SidePanel:
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
+
+            if self.scene.height > self.SCENE_HEIGHT_THRESHOLD:
+                self.line_spacing = self.LINE_SPACING_MAX
+            else:
+                self.line_spacing = self.LINE_SPACING_MIN
 
             if self.best_genome is None:
                 # this happens only at the first generation
@@ -94,9 +95,9 @@ class SidePanel:
 
             self.print_statistic(font, 'Controls:')
             self.print_statistic(font, 'S : save current genomes to file', self.LEFT_MARGIN)
-            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
             self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
             self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
             self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
 
     def display_info(self, object_to_place):
@@ -105,16 +106,17 @@ class SidePanel:
         if pygame.font:
             font = pygame.font.Font(None, self.FONT_SIZE)
             self.line_num = 1
+            self.line_spacing = self.LINE_SPACING_MAX
 
             self.print_statistic(font, 'Controls:')
-            self.print_statistic(font, 'S : save current scene to file', self.LEFT_MARGIN)
-            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
-            self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
-            self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, 'Click left : place ' + object_to_place, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Click right : remove ' + object_to_place, self.LEFT_MARGIN)
             self.print_statistic(font, 'J : add a vehicle', self.LEFT_MARGIN)
             self.print_statistic(font, 'K : remove a vehicle', self.LEFT_MARGIN)
-            self.print_statistic(font, 'Click left : place ' + object_to_place, self.LEFT_MARGIN)
-            self.print_statistic(font, 'Click right : delete ' + object_to_place, self.LEFT_MARGIN)
+            self.print_statistic(font, 'S : save current scene to file', self.LEFT_MARGIN)
+            self.print_statistic(font, '+ : incrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, '- : decrase scene speed', self.LEFT_MARGIN)
+            self.print_statistic(font, 'R : restart', self.LEFT_MARGIN)
             self.print_statistic(font, 'ESC : quit', self.LEFT_MARGIN)
 
     def print_statistic(self, font, text, extra_margin=0):
