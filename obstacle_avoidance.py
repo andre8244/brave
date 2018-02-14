@@ -5,6 +5,8 @@ import random
 import util.cli_parser
 
 from pygame.locals import *
+
+from ga_obstacle_avoidance.genome import Genome
 from robot.sensor_driven_robot import SensorDrivenRobot
 from util.color import Color
 from scene.scene import Scene
@@ -231,6 +233,9 @@ class ObstacleAvoidance:
         self.genomes_path = parser.genomes_path
 
     def load_genomes_from_file(self):
+        x = self.scene.width / 2
+        y = self.scene.height / 2
+
         with open(self.genomes_path) as f:
             line_number = 1
 
@@ -242,26 +247,26 @@ class ObstacleAvoidance:
                     line_number += 1
                     continue
 
-                robot_wheel_radius = values[0]
-                motor_ctrl_coefficient = values[1]
-                motor_ctrl_min_actuator_value = values[2]
-                sensor_delta_direction = values[3]
-                sensor_saturation_value = values[4]
-                sensor_max_distance = values[5]
+                robot_wheel_radius = float(values[0])
+                motor_ctrl_coefficient = float(values[1])
+                motor_ctrl_min_actuator_value = float(values[2])
+                sensor_delta_direction = float(values[3])
+                sensor_saturation_value = float(values[4])
+                sensor_max_distance = float(values[5])
 
-                # todo!
-                
+                genome = Genome(robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
+                                sensor_delta_direction, sensor_saturation_value, sensor_max_distance)
+
+                robot = genome.build_obstacle_avoidance_robot(x, y, self.ROBOT_SIZE, self.OBSTACLE_SENSOR_ERROR,
+                                                              self.scene)
+                self.robots.append(robot)
+                self.scene.put(robot)
                 line_number += 1
-
         f.closed
 
-        # for i in range(number_to_add):
-        #     x = random.randint(0, self.scene.width)
-        #     y = random.randint(0, self.scene.height)
-        #     robot = self.build_robot(x, y, 10, math.pi / 8)
-        #     self.scene.put(robot)
-        # print('number of robots:', len(self.robots))
+        print('number of robots:', len(self.robots))
 
 
 if __name__ == '__main__':
     ObstacleAvoidance()
+sce
