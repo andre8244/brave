@@ -4,6 +4,7 @@ import util.cli_parser
 
 from pygame.locals import *
 
+from util.scene_type import SceneType
 from util.side_panel import SidePanel
 from util.color import Color
 from scene.scene import Scene
@@ -100,7 +101,7 @@ class EvolutionObstacleAvoidance:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, True)
+        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.GA_OBSTACLE_AVOIDANCE)
 
         self.elitism_num = parser.elitism_num
         self.population_num = parser.population_num

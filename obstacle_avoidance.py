@@ -14,6 +14,7 @@ from sensor.proximity_sensor import ProximitySensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
 from geometry.point import Point
+from util.scene_type import SceneType
 from util.side_panel import SidePanel
 
 
@@ -52,6 +53,7 @@ class ObstacleAvoidance:
         self.side_panel = None
         self.scene_speed = None
         self.scene_path = None
+        self.genomes_path = None
 
         self.parse_cli_arguments()
         pygame.init()
@@ -109,9 +111,6 @@ class ObstacleAvoidance:
             clock.tick(int_scene_speed)
 
     def build_robot(self, x, y, robot_wheel_radius, obstacle_sensor_direction):
-        # global scene
-        # global robots
-
         robot = SensorDrivenRobot(x, y, self.ROBOT_SIZE, robot_wheel_radius)
 
         left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, self.OBSTACLE_SENSOR_SATURATION_VALUE,
@@ -132,23 +131,16 @@ class ObstacleAvoidance:
         return robot
 
     def build_box(self, x, y, size, color):
-        # global obstacles
-
         box = Box(x, y, size, color)
         self.obstacles.append(box)
         return box
 
     def build_wall(self, point1, point2, color):
-        # global obstacles
-
         wall = Wall(point1, point2, color)
         self.obstacles.append(wall)
         return wall
 
     def add_robots(self, number_to_add=1):
-        # global scene
-        # global robots
-
         for i in range(number_to_add):
             x = random.randint(0, self.scene.width)
             y = random.randint(0, self.scene.height)
@@ -157,17 +149,11 @@ class ObstacleAvoidance:
         print('number of robots:', len(self.robots))
 
     def remove_robot(self):
-        # global scene
-        # global robots
-
         if len(self.robots) > 0:
             self.scene.remove(self.robots.pop(0))
         print('number of robots:', len(self.robots))
 
     def create_boxes(self, number_to_add=1):
-        # global scene
-        # global obstacles
-
         for i in range(number_to_add):
             x = random.randint(0, self.scene.width)
             y = random.randint(0, self.scene.height)
@@ -179,17 +165,11 @@ class ObstacleAvoidance:
         print('number of obstacles:', len(self.obstacles))
 
     def add_box_at_cursor(self):
-        # global scene
-        # global obstacles
-
         x, y = pygame.mouse.get_pos()
         box = self.build_box(x, y, self.BOX_SIZE, Color.random_bright())
         self.scene.put(box)
 
     def remove_box_at_cursor(self):
-        # global scene
-        # global obstacles
-
         x, y = pygame.mouse.get_pos()
 
         for obstacle in self.obstacles:
@@ -203,9 +183,6 @@ class ObstacleAvoidance:
                     break
 
     def add_walls(self, number_to_add=1):
-        # global scene
-        # global obstacles
-
         for i in range(number_to_add):
             x1 = random.randint(0, self.scene.width)
             y1 = random.randint(0, self.scene.height)
@@ -220,50 +197,70 @@ class ObstacleAvoidance:
 
         print('number of obstacles:', len(self.obstacles))
 
-    # def remove_box():
-    #     global scene
-    #     global obstacles
-    #
-    #     if len(obstacles) > 0:
-    #         scene.remove(obstacles.pop(0))
-    #     print('number of obstacles:', len(obstacles))
-
     def initialize(self):
-        # global scene
-        # global robots
-        # global obstacles
-        # global screen
-        # global side_panel
-
         self.robots = []
         self.obstacles = []
         self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene)
-        self.add_robots(self.N_ROBOTS)
+
+        if self.genomes_path is None:
+            self.add_robots(self.N_ROBOTS)
+        else:
+            self.load_genomes_from_file()
+
         self.create_boxes(self.N_INITIAL_BOXES)
         self.add_walls(self.N_INITIAL_WALLS)
 
     def increase_scene_speed(self):
-        # global scene
-
         if self.scene.speed < self.SCENE_MAX_SPEED:
             self.scene.speed *= self.SCENE_SPEED_CHANGE_COEFF
         print('scene.speed:', self.scene.speed)
 
     def decrease_scene_speed(self):
-        # global scene
-
         if self.scene.speed > self.SCENE_MIN_SPEED:
             self.scene.speed /= self.SCENE_SPEED_CHANGE_COEFF
         print('scene.speed:', self.scene.speed)
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, False)
+        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.OBSTACLE_AVOIDANCE)
 
         self.scene_speed = parser.scene_speed
         self.scene_path = parser.scene_path
+        self.genomes_path = parser.genomes_path
+
+    def load_genomes_from_file(self):
+        with open(self.genomes_path) as f:
+            line_number = 1
+
+            for line in f:
+                values = line.split()
+
+                # skip comments in file
+                if values[0][0] == '#':
+                    line_number += 1
+                    continue
+
+                robot_wheel_radius = values[0]
+                motor_ctrl_coefficient = values[1]
+                motor_ctrl_min_actuator_value = values[2]
+                sensor_delta_direction = values[3]
+                sensor_saturation_value = values[4]
+                sensor_max_distance = values[5]
+
+                # todo!
+                
+                line_number += 1
+
+        f.closed
+
+        # for i in range(number_to_add):
+        #     x = random.randint(0, self.scene.width)
+        #     y = random.randint(0, self.scene.height)
+        #     robot = self.build_robot(x, y, 10, math.pi / 8)
+        #     self.scene.put(robot)
+        # print('number of robots:', len(self.robots))
 
 
 if __name__ == '__main__':

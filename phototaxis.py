@@ -12,6 +12,7 @@ from scene.light import Light
 from sensor.light_sensor import LightSensor
 from robot.actuator import Actuator
 from robot.motor_controller import MotorController
+from util.scene_type import SceneType
 from util.side_panel import SidePanel
 
 
@@ -196,7 +197,7 @@ class Phototaxis:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, False)
+        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.PHOTOTAXIS)
 
         self.scene_speed = parser.scene_speed
         self.scene_path = parser.scene_path

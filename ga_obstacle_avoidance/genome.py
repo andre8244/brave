@@ -22,15 +22,15 @@ SENSOR_MAX_DISTANCE_MAX = 150
 
 class Genome:
 
-    def __init__(self, generation_num, robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
-                 sensor_delta_direction, sensor_saturation_value, sensor_max_distance):
-        self.generation_num = generation_num
+    def __init__(self, robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
+                 sensor_delta_direction, sensor_saturation_value, sensor_max_distance, generation_num=None):
         self.robot_wheel_radius = robot_wheel_radius
         self.motor_ctrl_coefficient = motor_ctrl_coefficient
         self.motor_ctrl_min_actuator_value = motor_ctrl_min_actuator_value
         self.sensor_delta_direction = sensor_delta_direction
         self.sensor_saturation_value = sensor_saturation_value
         self.sensor_max_distance = sensor_max_distance
+        self.generation_num = generation_num
         self.fitness = None
 
     @staticmethod
@@ -43,8 +43,8 @@ class Genome:
         sensor_saturation_value = random.uniform(SENSOR_SATURATION_VALUE_MIN, SENSOR_SATURATION_VALUE_MAX)
         sensor_max_distance = random.uniform(SENSOR_MAX_DISTANCE_MIN, SENSOR_MAX_DISTANCE_MAX)
 
-        return Genome(generation_num, robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
-                      sensor_delta_direction, sensor_saturation_value, sensor_max_distance)
+        return Genome(robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
+                      sensor_delta_direction, sensor_saturation_value, sensor_max_distance, generation_num)
 
     def crossover(self, other_parent, generation_num):
         # apply uniform crossover to generate a new genome
@@ -59,8 +59,8 @@ class Genome:
             other_parent.sensor_saturation_value
         sensor_max_distance = self.sensor_max_distance if random.random() < 0.5 else other_parent.sensor_max_distance
 
-        return Genome(generation_num, robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
-                      sensor_delta_direction, sensor_saturation_value, sensor_max_distance)
+        return Genome(robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
+                      sensor_delta_direction, sensor_saturation_value, sensor_max_distance, generation_num)
 
     def mutation(self, mutation_probability, mutation_coefficient):
         self.robot_wheel_radius = self.mutate_with_probability(self.robot_wheel_radius, mutation_probability,
@@ -136,3 +136,25 @@ class Genome:
                str(self.motor_ctrl_min_actuator_value) + ' ' + str(self.sensor_delta_direction) + ' ' + \
                str(self.sensor_saturation_value) + ' ' + str(self.sensor_max_distance) + ' ' + \
                str(self.generation_num) + ' ' + str(self.fitness)
+
+    def build_sensor_driven_robot(self):
+        pass
+        # todo!
+        # robot = SensorDrivenRobot(x, y, self.ROBOT_SIZE, robot_wheel_radius)
+        #
+        # left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, self.OBSTACLE_SENSOR_SATURATION_VALUE,
+        #                                        self.OBSTACLE_SENSOR_ERROR, self.OBSTACLE_SENSOR_MAX_DISTANCE, self.scene)
+        # right_obstacle_sensor = ProximitySensor(robot, -obstacle_sensor_direction, self.OBSTACLE_SENSOR_SATURATION_VALUE,
+        #                                         self.OBSTACLE_SENSOR_ERROR, self.OBSTACLE_SENSOR_MAX_DISTANCE, self.scene)
+        # left_wheel_actuator = Actuator()
+        # right_wheel_actuator = Actuator()
+        # left_motor_controller = MotorController(left_obstacle_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
+        #                                         self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+        # right_motor_controller = MotorController(right_obstacle_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
+        #                                          self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
+        #
+        # robot.set_left_motor_controller(left_motor_controller)
+        # robot.set_right_motor_controller(right_motor_controller)
+        #
+        # self.robots.append(robot)
+        # return robot

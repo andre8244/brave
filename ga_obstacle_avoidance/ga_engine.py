@@ -330,7 +330,7 @@ class GaEngine:
         file_path = 'saved_genomes/' + file_name
 
         with open(file_path, 'w') as f:
-            line1 = '# generation_num and fitness values are ignored when a genome file is loaded'
+            line1 = '# generation_num and fitness are ignored when a genome file is loaded'
             line2 = '# This is the structure of each line:'
             line3 = '# robot_wheel_radius motor_ctrl_coefficient motor_ctrl_min_actuator_value ' +\
                     'sensor_delta_direction sensor_saturation_value sensor_max_distance generation_num fitness'
