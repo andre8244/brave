@@ -30,7 +30,7 @@ class Phototaxis:
     MOTOR_CONTROLLER_COEFFICIENT = 0.5
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/empty_scene_700.txt'
+    DEFAULT_SCENE_PATH = 'saved_scenes/empty_700.txt'
     DEFAULT_SCENE_SPEED = 30
     SCENE_MAX_SPEED = 200
     SCENE_MIN_SPEED = 1

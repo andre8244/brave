@@ -33,19 +33,21 @@ class ObstacleAvoidance:
     MOTOR_CONTROLLER_COEFFICIENT = 300
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/empty_scene_700.txt'
+    DEFAULT_SCENE_PATH = 'saved_scenes/walls_700.txt'
     DEFAULT_SCENE_SPEED = 30
     SCENE_MAX_SPEED = 200
     SCENE_MIN_SPEED = 1
     SCENE_SPEED_CHANGE_COEFF = 1.5
 
     ROBOT_SIZE = 25
-    SCREEN_MARGIN = ROBOT_SIZE / 2
+    SCREEN_MARGIN = int(ROBOT_SIZE / 2)
     SIDE_PANEL_WIDTH = 400
 
     BOX_SIZE = 40
     BOX_SIZE_MIN = 20
     BOX_SIZE_INTERVAL = 60
+
+    N_GENOMES_TO_LOAD = 10
 
     def __init__(self):
         self.scene = None
@@ -56,6 +58,7 @@ class ObstacleAvoidance:
         self.scene_speed = None
         self.scene_path = None
         self.genomes_path = None
+        self.draw_robot_labels = False
 
         self.parse_cli_arguments()
         pygame.init()
@@ -106,6 +109,9 @@ class ObstacleAvoidance:
             for obj in self.scene.objects:
                 obj.draw(self.screen)
 
+                if self.draw_robot_labels and issubclass(type(obj), SensorDrivenRobot):
+                    obj.draw_label(self.screen)
+
             self.side_panel.display_info('an obstacle')
 
             pygame.display.flip()
@@ -144,8 +150,8 @@ class ObstacleAvoidance:
 
     def add_robots(self, number_to_add=1):
         for i in range(number_to_add):
-            x = random.randint(0, self.scene.width)
-            y = random.randint(0, self.scene.height)
+            x = self.scene.width / 2
+            y = self.scene.height / 2
             robot = self.build_robot(x, y, 10, math.pi / 8)
             self.scene.put(robot)
         print('number of robots:', len(self.robots))
@@ -233,6 +239,8 @@ class ObstacleAvoidance:
         self.genomes_path = parser.genomes_path
 
     def load_genomes_from_file(self):
+        self.draw_robot_labels = True
+        n_genomes_loaded = 0
         x = self.scene.width / 2
         y = self.scene.height / 2
 
@@ -240,6 +248,10 @@ class ObstacleAvoidance:
             line_number = 1
 
             for line in f:
+                # load only the first N_GENOMES_TO_LOAD genomes (genomes file could be very large)
+                if n_genomes_loaded == self.N_GENOMES_TO_LOAD:
+                    break
+
                 values = line.split()
 
                 # skip comments in file
@@ -259,8 +271,10 @@ class ObstacleAvoidance:
 
                 robot = genome.build_obstacle_avoidance_robot(x, y, self.ROBOT_SIZE, self.OBSTACLE_SENSOR_ERROR,
                                                               self.scene)
+                robot.label = line_number
                 self.robots.append(robot)
                 self.scene.put(robot)
+                n_genomes_loaded += 1
                 line_number += 1
         f.closed
 
@@ -269,4 +283,3 @@ class ObstacleAvoidance:
 
 if __name__ == '__main__':
     ObstacleAvoidance()
-sce

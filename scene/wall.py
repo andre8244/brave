@@ -21,7 +21,7 @@ class Wall(Obstacle):
 
     def draw_label(self, screen):
         if pygame.font:
-            font = pygame.font.Font(None, 26)
+            font = pygame.font.Font(None, 24)
             text = font.render(str(self.label), 1, Color.YELLOW, Color.DARK_GRAY)
             rect_x = (self.point1.x + self.point2.x) / 2
             rect_y = (self.point1.y + self.point2.y) / 2
