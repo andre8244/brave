@@ -19,7 +19,7 @@ class EvolutionObstacleAvoidance:
     DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
     DEFAULT_VERBOSE_VALUE = 0  # 0, 1, 2
     SCENE_MAX_SPEED = 3000
-    STATISTICS_PANEL_WIDTH = 480
+    SIDE_PANEL_WIDTH = 480
 
     def __init__(self):
         self.scene = None
@@ -71,6 +71,10 @@ class EvolutionObstacleAvoidance:
                 if issubclass(type(obj), SensorDrivenRobot) and obj.label is not None:
                     obj.draw_label(self.screen)
 
+            # draw a black background for the side panel
+            side_panel_bg_rect = pygame.Rect(self.scene.width, 0, self.SIDE_PANEL_WIDTH, self.scene.height)
+            pygame.draw.rect(self.screen, Color.BLACK, side_panel_bg_rect)
+
             self.side_panel.display_ga_info()
 
             pygame.display.flip()
@@ -78,7 +82,7 @@ class EvolutionObstacleAvoidance:
             clock.tick(int_scene_speed)
 
     def initialize(self):
-        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.STATISTICS_PANEL_WIDTH)
+        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene, self.population_num)
         self.engine = GaEngine(self.scene, self.side_panel, self.population_num, self.elitism_num, self.robot_random_direction, self.multicore,

@@ -101,6 +101,10 @@ class Phototaxis:
             for obj in self.scene.objects:
                 obj.draw(self.screen)
 
+            # draw a black background for the side panel
+            side_panel_bg_rect = pygame.Rect(self.scene.width, 0, self.SIDE_PANEL_WIDTH, self.scene.height)
+            pygame.draw.rect(self.screen, Color.BLACK, side_panel_bg_rect)
+
             self.side_panel.display_info('a light')
 
             pygame.display.flip()

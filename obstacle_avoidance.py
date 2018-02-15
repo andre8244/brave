@@ -112,6 +112,10 @@ class ObstacleAvoidance:
                 if self.draw_robot_labels and issubclass(type(obj), SensorDrivenRobot):
                     obj.draw_label(self.screen)
 
+            # draw a black background for the side panel
+            side_panel_bg_rect = pygame.Rect(self.scene.width, 0, self.SIDE_PANEL_WIDTH, self.scene.height)
+            pygame.draw.rect(self.screen, Color.BLACK, side_panel_bg_rect)
+
             self.side_panel.display_info('an obstacle')
 
             pygame.display.flip()
