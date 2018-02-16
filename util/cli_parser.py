@@ -62,7 +62,7 @@ class CliParser:
                             metavar='FILE')
 
         parser.add_argument('-f', '--fps',
-                            help='Number of frames per second (0 = maximum fps). Default: ' + str(default_scene_speed),
+                            help='Maximum frame rate (0 = no limit). Default: ' + str(default_scene_speed),
                             type=int, metavar='NUM')
 
         args = parser.parse_args()
