@@ -15,8 +15,8 @@ from util.time_util import TimeUtil
 
 class EvolutionObstacleAvoidance:
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/obstacle_avoidance_900.txt'
-    DEFAULT_SCENE_SPEED = 0  # 0 = maximum fps
+    DEFAULT_SCENE_FILE = 'saved_scenes/obstacle_avoidance_900.txt'
+    DEFAULT_SCENE_SPEED = 0  # 0 = maximum frame rate
     DEFAULT_VERBOSE_VALUE = 0  # 0, 1, 2
     SCENE_MAX_SPEED = 3000
     SIDE_PANEL_WIDTH = 480
@@ -28,7 +28,7 @@ class EvolutionObstacleAvoidance:
         self.side_panel = None
         self.population_num = None
         self.scene_speed = None
-        self.scene_path = None
+        self.scene_file = None
         self.elitism_num = None
         self.robot_random_direction = None
         self.multicore = None
@@ -37,6 +37,7 @@ class EvolutionObstacleAvoidance:
         self.mutation_coefficient = None
         self.selection_ratio = None
         self.verbose = None
+        self.long_lasting_generations = None
 
         self.parse_cli_arguments()
         pygame.init()
@@ -82,11 +83,13 @@ class EvolutionObstacleAvoidance:
             clock.tick(int_scene_speed)
 
     def initialize(self):
-        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
+        self.scene = Scene.load_from_file(self.scene_file, self.scene_speed, self.SIDE_PANEL_WIDTH)
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene, self.population_num)
-        self.engine = GaEngine(self.scene, self.side_panel, self.population_num, self.elitism_num, self.robot_random_direction, self.multicore,
-                               self.obstacle_sensor_error, self.mutation_probability, self.mutation_coefficient, self.selection_ratio, self.verbose)
+        self.engine = GaEngine(self.scene, self.side_panel, self.population_num, self.elitism_num,
+                               self.robot_random_direction, self.multicore, self.obstacle_sensor_error,
+                               self.mutation_probability, self.mutation_coefficient, self.selection_ratio,
+                               self.long_lasting_generations, self.verbose)
 
     def increase_scene_speed(self):
         if self.scene.speed < self.SCENE_MAX_SPEED:
@@ -105,7 +108,7 @@ class EvolutionObstacleAvoidance:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.GA_OBSTACLE_AVOIDANCE)
+        parser.parse_args(self.DEFAULT_SCENE_FILE, self.DEFAULT_SCENE_SPEED, SceneType.GA_OBSTACLE_AVOIDANCE)
 
         self.elitism_num = parser.elitism_num
         self.population_num = parser.population_num
@@ -113,11 +116,12 @@ class EvolutionObstacleAvoidance:
         self.mutation_coefficient = parser.mutation_coefficient
         self.robot_random_direction = parser.robot_random_direction
         self.scene_speed = parser.scene_speed
-        self.scene_path = parser.scene_file
+        self.scene_file = parser.scene_file
         self.obstacle_sensor_error = parser.obstacle_sensor_error
         self.selection_ratio = parser.selection_ratio
         self.multicore = parser.multicore
         self.verbose = parser.verbose
+        self.long_lasting_generations = parser.long_lasting_generations
 
     def printd(self, min_debug_level, *args):
         if self.verbose >= min_debug_level:

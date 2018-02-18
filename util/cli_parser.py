@@ -21,6 +21,7 @@ class CliParser:
         self.scene_speed = None
         self.genome_file = None
         self.load_all_genomes = None
+        self.long_lasting_generations = None
 
     def parse_args(self, default_scene_file, default_scene_speed, scene_type):
         parser = argparse.ArgumentParser()
@@ -54,6 +55,9 @@ class CliParser:
                                 help='Coefficient used to simulate the obstacle sensor read error. Default: ' + str(
                                     GaEngine.DEFAULT_OBSTACLE_SENSOR_ERROR) + ', recommended: < 0.2', type=float, metavar='NUM')
 
+            parser.add_argument('-l', '--long_lasting_generations', help='Enable long lasting generations',
+                                action='store_true')
+
             parser.add_argument('-c', '--multicore', help='Enable multicore support (experimental)', action='store_true')
 
         if scene_type == SceneType.OBSTACLE_AVOIDANCE:
@@ -81,6 +85,7 @@ class CliParser:
             self.selection_ratio = GaEngine.DEFAULT_SELECTION_RATIO if args.selection_ratio is None else args.selection_ratio
             self.multicore = args.multicore
             self.verbose = EvolutionObstacleAvoidance.DEFAULT_VERBOSE_VALUE if args.verbose is None else args.verbose
+            self.long_lasting_generations = args.long_lasting_generations
 
         if scene_type == SceneType.OBSTACLE_AVOIDANCE:
             self.genome_file = args.genomes

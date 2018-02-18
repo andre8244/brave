@@ -22,13 +22,14 @@ class GaEngine:
     DEFAULT_MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
     DEFAULT_MUTATION_COEFFICIENT = 0.07
     DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
-    LONG_LASTING_GENERATION_STEP_NUM = 3000  # 3000
-    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00001  # increasing probability to add a new obstacle in the scene
+    LONG_LASTING_GENERATION_STEP_NUM = 3000
+    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00001  # increasing probability to add a new obstacle in the scene.
     BOX_MIN_SIZE = 20
     BOX_MAX_SIZE = 60
 
     def __init__(self, scene, side_panel, population_num, elitism_num, robot_random_direction, multicore,
-                 obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio, verbose):
+                 obstacle_sensor_error, mutation_probability, mutation_coefficient, selection_ratio,
+                 long_lasting_generations, verbose):
         self.scene = scene
         self.side_panel = side_panel
         self.population_num = population_num
@@ -39,6 +40,7 @@ class GaEngine:
         self.mutation_probability = mutation_probability
         self.mutation_coefficient = mutation_coefficient
         self.selection_ratio = selection_ratio
+        self.long_lasting_generations = long_lasting_generations
         self.verbose = verbose
         self.robots = []
         self.genomes = []
@@ -128,7 +130,7 @@ class GaEngine:
                     self.destroy_robot(robot)
 
         # create new obstacles for long lasting generations
-        if self.generation_step_num > self.LONG_LASTING_GENERATION_STEP_NUM:
+        if not self.long_lasting_generations and self.generation_step_num > self.LONG_LASTING_GENERATION_STEP_NUM:
             self.new_obstacle_probability += self.LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA
 
             if random.random() < self.new_obstacle_probability:
