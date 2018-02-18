@@ -21,7 +21,7 @@ class Phototaxis:
     N_ROBOTS = 5
     N_INITIAL_LIGHTS = 0
 
-    PHOTOTAXIS = True  # toggle between phototaxis and anti-phototaxis
+    PHOTOTAXIS = True  # toggle phototaxis / anti-phototaxis
     LIGHT_EMITTING_POWER = 20
 
     LIGHT_SENSOR_SATURATION_VALUE = 100

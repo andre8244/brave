@@ -1,6 +1,5 @@
 import sys
 import pygame
-import math
 import random
 import util.cli_parser
 
@@ -12,9 +11,6 @@ from util.color import Color
 from scene.scene import Scene
 from scene.box import Box
 from scene.wall import Wall
-from sensor.proximity_sensor import ProximitySensor
-from robot.actuator import Actuator
-from robot.motor_controller import MotorController
 from geometry.point import Point
 from util.scene_type import SceneType
 from util.side_panel import SidePanel
@@ -26,12 +22,13 @@ class ObstacleAvoidance:
     N_INITIAL_BOXES = 0
     N_INITIAL_WALLS = 0
 
-    OBSTACLE_SENSOR_MAX_DISTANCE = 100
-    OBSTACLE_SENSOR_SATURATION_VALUE = 50
-    OBSTACLE_SENSOR_ERROR = 0.1
-
-    MOTOR_CONTROLLER_COEFFICIENT = 300
-    MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
+    WHEEL_RADIUS = ROBOT_SIZE = 22
+    MOTOR_CONTROLLER_COEFFICIENT = 350
+    MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 10
+    SENSOR_DELTA_DIRECTION = 0.55
+    SENSOR_SATURATION_VALUE = 85
+    SENSOR_MAX_DISTANCE = 130
+    SENSOR_ERROR = 0.1
 
     DEFAULT_SCENE_FILE = 'saved_scenes/four_boxes_and_walls_700.txt'
     DEFAULT_SCENE_SPEED = 30
@@ -40,7 +37,6 @@ class ObstacleAvoidance:
     SCENE_SPEED_CHANGE_COEFF = 1.5
     SAVED_SCENE_FILENAME = 'obstacle_avoidance_scene'
 
-    ROBOT_SIZE = 25
     SCREEN_MARGIN = int(ROBOT_SIZE / 2)
     SIDE_PANEL_WIDTH = 400
 
@@ -125,26 +121,6 @@ class ObstacleAvoidance:
             int_scene_speed = int(round(self.scene.speed))
             clock.tick(int_scene_speed)
 
-    def build_robot(self, x, y, robot_wheel_radius, obstacle_sensor_direction):
-        robot = SensorDrivenRobot(x, y, self.ROBOT_SIZE, robot_wheel_radius)
-
-        left_obstacle_sensor = ProximitySensor(robot, obstacle_sensor_direction, self.OBSTACLE_SENSOR_SATURATION_VALUE,
-                                               self.OBSTACLE_SENSOR_ERROR, self.OBSTACLE_SENSOR_MAX_DISTANCE, self.scene)
-        right_obstacle_sensor = ProximitySensor(robot, -obstacle_sensor_direction, self.OBSTACLE_SENSOR_SATURATION_VALUE,
-                                                self.OBSTACLE_SENSOR_ERROR, self.OBSTACLE_SENSOR_MAX_DISTANCE, self.scene)
-        left_wheel_actuator = Actuator()
-        right_wheel_actuator = Actuator()
-        left_motor_controller = MotorController(left_obstacle_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, left_wheel_actuator,
-                                                self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-        right_motor_controller = MotorController(right_obstacle_sensor, self.MOTOR_CONTROLLER_COEFFICIENT, right_wheel_actuator,
-                                                 self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE)
-
-        robot.set_left_motor_controller(left_motor_controller)
-        robot.set_right_motor_controller(right_motor_controller)
-
-        self.robots.append(robot)
-        return robot
-
     def build_box(self, x, y, size, color):
         box = Box(x, y, size, color)
         self.obstacles.append(box)
@@ -156,11 +132,18 @@ class ObstacleAvoidance:
         return wall
 
     def add_robots(self, number_to_add=1):
+        genome = Genome(self.WHEEL_RADIUS, self.MOTOR_CONTROLLER_COEFFICIENT, self.MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE,
+                        self.SENSOR_DELTA_DIRECTION, self.SENSOR_SATURATION_VALUE, self.SENSOR_MAX_DISTANCE)
+        # initial_direction = random.random() * 2 * math.pi
+        # delta_direction = 2 * math.pi / number_to_add
+
         for i in range(number_to_add):
             x = self.scene.width / 2
             y = self.scene.height / 2
-            robot = self.build_robot(x, y, 10, math.pi / 8)
+            robot = genome.build_obstacle_avoidance_robot(x, y, self.ROBOT_SIZE, self.SENSOR_ERROR, self.scene)
+            # robot.direction = initial_direction + i * delta_direction
             self.scene.put(robot)
+            self.robots.append(robot)
         print('Number of robots:', len(self.robots))
 
     def remove_robot(self):
@@ -286,7 +269,7 @@ class ObstacleAvoidance:
                 genome = Genome(robot_wheel_radius, motor_ctrl_coefficient, motor_ctrl_min_actuator_value,
                                 sensor_delta_direction, sensor_saturation_value, sensor_max_distance)
 
-                robot = genome.build_obstacle_avoidance_robot(x, y, self.ROBOT_SIZE, self.OBSTACLE_SENSOR_ERROR,
+                robot = genome.build_obstacle_avoidance_robot(x, y, self.ROBOT_SIZE, self.SENSOR_ERROR,
                                                               self.scene)
                 robot.label = line_number
                 self.robots.append(robot)
