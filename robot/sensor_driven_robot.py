@@ -49,7 +49,7 @@ class SensorDrivenRobot(DifferentialDriveRobot):
         super().draw(screen)
 
     def draw_label(self, screen):
-        if pygame.font:
+        if pygame.font and self.label is not None:
             font = pygame.font.Font(None, 24)
             text = font.render(str(self.label), 1, Color.YELLOW, Color.DARK_GRAY)
             text_pos = pygame.Rect(self.x + (self.length / 2), self.y + (self.length / 2), 50, 50)

@@ -70,9 +70,6 @@ class GaEngine:
     def step(self):
         start_time = TimeUtil.current_time_millis()
 
-        if self.generation_step_num % 500 == 0: ### todo delete
-            print('generation_step_num', self.generation_step_num)
-
         if self.multicore:
             threads = []
             num_robots = len(self.robots)

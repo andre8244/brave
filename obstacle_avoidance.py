@@ -33,21 +33,22 @@ class ObstacleAvoidance:
     MOTOR_CONTROLLER_COEFFICIENT = 300
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/walls_700.txt'
+    DEFAULT_SCENE_FILE = 'saved_scenes/four_boxes_and_walls_700.txt'
     DEFAULT_SCENE_SPEED = 30
     SCENE_MAX_SPEED = 200
     SCENE_MIN_SPEED = 1
     SCENE_SPEED_CHANGE_COEFF = 1.5
+    SAVED_SCENE_FILENAME = 'obstacle_avoidance_scene'
 
     ROBOT_SIZE = 25
     SCREEN_MARGIN = int(ROBOT_SIZE / 2)
     SIDE_PANEL_WIDTH = 400
 
-    BOX_SIZE = 40
+    BOX_SIZE = 60
     BOX_SIZE_MIN = 20
     BOX_SIZE_INTERVAL = 60
 
-    N_GENOMES_TO_LOAD = 10
+    N_GENOMES_TO_LOAD_FROM_FILE = 10
 
     def __init__(self):
         self.scene = None
@@ -56,9 +57,9 @@ class ObstacleAvoidance:
         self.obstacles = None
         self.side_panel = None
         self.scene_speed = None
-        self.scene_path = None
-        self.genomes_path = None
-        self.draw_robot_labels = False
+        self.scene_file = None
+        self.genome_file = None
+        self.load_all_genomes = None
 
         self.parse_cli_arguments()
         pygame.init()
@@ -89,7 +90,7 @@ class ObstacleAvoidance:
                 elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                     self.decrease_scene_speed()
                 elif event.type == KEYDOWN and event.key == K_s:
-                    self.scene.save('obstacle_avoidance_scene')
+                    self.scene.save(self.SAVED_SCENE_FILENAME)
 
             # teleport at the margins
             for robot in self.robots:
@@ -109,7 +110,9 @@ class ObstacleAvoidance:
             for obj in self.scene.objects:
                 obj.draw(self.screen)
 
-                if self.draw_robot_labels and issubclass(type(obj), SensorDrivenRobot):
+                # Draw object label
+                if self.genome_file is not None and issubclass(type(obj), SensorDrivenRobot) \
+                        or self.scene_file != self.DEFAULT_SCENE_FILE:
                     obj.draw_label(self.screen)
 
             # draw a black background for the side panel
@@ -158,12 +161,12 @@ class ObstacleAvoidance:
             y = self.scene.height / 2
             robot = self.build_robot(x, y, 10, math.pi / 8)
             self.scene.put(robot)
-        print('number of robots:', len(self.robots))
+        print('Number of robots:', len(self.robots))
 
     def remove_robot(self):
         if len(self.robots) > 0:
             self.scene.remove(self.robots.pop(0))
-        print('number of robots:', len(self.robots))
+        print('Number of robots:', len(self.robots))
 
     def create_boxes(self, number_to_add=1):
         for i in range(number_to_add):
@@ -173,8 +176,6 @@ class ObstacleAvoidance:
             size = random.randint(self.BOX_SIZE_MIN, self.BOX_SIZE_INTERVAL)
             box = self.build_box(x, y, size, Color.random_bright())
             self.scene.put(box)
-
-        print('number of obstacles:', len(self.obstacles))
 
     def add_box_at_cursor(self):
         x, y = pygame.mouse.get_pos()
@@ -207,22 +208,27 @@ class ObstacleAvoidance:
             wall = self.build_wall(point1, point2, Color.random_color(127, 127, 127))
             self.scene.put(wall)
 
-        print('number of obstacles:', len(self.obstacles))
-
     def initialize(self):
         self.robots = []
         self.obstacles = []
-        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
+        self.init_scene()
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene)
 
-        if self.genomes_path is None:
+        if self.genome_file is None:
             self.add_robots(self.N_ROBOTS)
         else:
             self.load_genomes_from_file()
 
         self.create_boxes(self.N_INITIAL_BOXES)
         self.add_walls(self.N_INITIAL_WALLS)
+
+    def init_scene(self):
+        self.scene = Scene.load_from_file(self.scene_file, self.scene_speed, self.SIDE_PANEL_WIDTH)
+
+        for obj in self.scene.objects:
+            if issubclass(type(obj), Box):
+                self.obstacles.append(obj)
 
     def increase_scene_speed(self):
         if self.scene.speed < self.SCENE_MAX_SPEED:
@@ -236,27 +242,34 @@ class ObstacleAvoidance:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.OBSTACLE_AVOIDANCE)
+        parser.parse_args(self.DEFAULT_SCENE_FILE, self.DEFAULT_SCENE_SPEED, SceneType.OBSTACLE_AVOIDANCE)
 
         self.scene_speed = parser.scene_speed
-        self.scene_path = parser.scene_path
-        self.genomes_path = parser.genomes_path
+        self.scene_file = parser.scene_file
+        self.genome_file = parser.genome_file
+        self.load_all_genomes = parser.load_all_genomes
 
     def load_genomes_from_file(self):
-        self.draw_robot_labels = True
         n_genomes_loaded = 0
         x = self.scene.width / 2
         y = self.scene.height / 2
 
-        with open(self.genomes_path) as f:
+        with open(self.genome_file) as f:
             line_number = 1
 
             for line in f:
                 # load only the first N_GENOMES_TO_LOAD genomes (genomes file could be very large)
-                if n_genomes_loaded == self.N_GENOMES_TO_LOAD:
+                if not self.load_all_genomes and n_genomes_loaded == self.N_GENOMES_TO_LOAD_FROM_FILE:
+                    print('Loaded ' + str(self.N_GENOMES_TO_LOAD_FROM_FILE) +
+                          ' genomes. To load all of them, use --load_all_genomes parameter')
                     break
 
                 values = line.split()
+
+                # skip empty lines
+                if len(values) == 0:
+                    line_number += 1
+                    continue
 
                 # skip comments in file
                 if values[0][0] == '#':
@@ -282,7 +295,7 @@ class ObstacleAvoidance:
                 line_number += 1
         f.closed
 
-        print('number of robots:', len(self.robots))
+        print('Number of robots:', len(self.robots))
 
 
 if __name__ == '__main__':

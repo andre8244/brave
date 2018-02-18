@@ -109,7 +109,7 @@ class SidePanel:
             self.line_spacing = self.LINE_SPACING_MAX
 
             self.print_statistic(font, 'Controls:')
-            self.print_statistic(font, 'Click left : place ' + object_to_place, self.LEFT_MARGIN)
+            self.print_statistic(font, 'Click left : add ' + object_to_place, self.LEFT_MARGIN)
             self.print_statistic(font, 'Click right : remove ' + object_to_place, self.LEFT_MARGIN)
             self.print_statistic(font, 'J : add a vehicle', self.LEFT_MARGIN)
             self.print_statistic(font, 'K : remove a vehicle', self.LEFT_MARGIN)

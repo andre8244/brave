@@ -30,11 +30,12 @@ class Phototaxis:
     MOTOR_CONTROLLER_COEFFICIENT = 0.5
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 20
 
-    DEFAULT_SCENE_PATH = 'saved_scenes/empty_700.txt'
+    DEFAULT_SCENE_FILE = 'saved_scenes/four_lights_700.txt'
     DEFAULT_SCENE_SPEED = 30
     SCENE_MAX_SPEED = 200
     SCENE_MIN_SPEED = 1
     SCENE_SPEED_CHANGE_COEFF = 1.5
+    SAVED_SCENE_FILENAME = 'phototaxis_scene'
 
     ROBOT_SIZE = 30
     SCREEN_MARGIN = ROBOT_SIZE / 2
@@ -50,7 +51,7 @@ class Phototaxis:
         self.lights = None
         self.side_panel = None
         self.scene_speed = None
-        self.scene_path = None
+        self.scene_file = None
 
         self.parse_cli_arguments()
         pygame.init()
@@ -81,7 +82,7 @@ class Phototaxis:
                 elif event.type == KEYDOWN and (event.key == K_MINUS or event.key == 47 or event.key == 269):
                     self.decrease_scene_speed()
                 elif event.type == KEYDOWN and event.key == K_s:
-                    self.scene.save('phototaxis_scene')
+                    self.scene.save(self.SAVED_SCENE_FILENAME)
 
             # teleport at the margins
             for robot in self.robots:
@@ -100,6 +101,10 @@ class Phototaxis:
 
             for obj in self.scene.objects:
                 obj.draw(self.screen)
+
+                # Draw object label
+                if self.scene_file != self.DEFAULT_SCENE_FILE:
+                    obj.draw_label(self.screen)
 
             # draw a black background for the side panel
             side_panel_bg_rect = pygame.Rect(self.scene.width, 0, self.SIDE_PANEL_WIDTH, self.scene.height)
@@ -148,12 +153,12 @@ class Phototaxis:
             y = random.randint(0, self.scene.height)
             robot = self.build_robot(x, y, 10, math.pi / 4)
             self.scene.put(robot)
-        # print('number of robots:', len(robots))
+        print('Number of robots:', len(self.robots))
 
     def remove_robot(self):
         if len(self.robots) > 0:
             self.scene.remove(self.robots.pop(0))
-        # print('number of robots:', len(robots))
+        print('Number of robots:', len(self.robots))
 
     def create_lights(self, number_to_add=1):
         for i in range(number_to_add):
@@ -162,13 +167,11 @@ class Phototaxis:
             emitting_power = random.randint(self.LIGHT_EMITTING_POWER_MIN, self.LIGHT_EMITTING_POWER_INTERVAL)
             light = self.build_light(x, y, emitting_power, Color.YELLOW, Color.BLACK)
             self.scene.put(light)
-        # print('number of lights:', len(lights))
 
     def add_light_at_cursor(self):
         x, y = pygame.mouse.get_pos()
         light = self.build_light(x, y, self.LIGHT_EMITTING_POWER, Color.YELLOW, Color.BLACK)
         self.scene.put(light)
-        # print('number of lights:', len(lights))
 
     def remove_light_at_cursor(self):
         x, y = pygame.mouse.get_pos()
@@ -183,11 +186,18 @@ class Phototaxis:
     def initialize(self):
         self.robots = []
         self.lights = []
-        self.scene = Scene.load_from_file(self.scene_path, self.scene_speed, self.SIDE_PANEL_WIDTH)
+        self.init_scene()
         self.screen = self.scene.screen
         self.side_panel = SidePanel(self.scene)
         self.add_robots(self.N_ROBOTS)
         self.create_lights(self.N_INITIAL_LIGHTS)
+
+    def init_scene(self):
+        self.scene = Scene.load_from_file(self.scene_file, self.scene_speed, self.SIDE_PANEL_WIDTH)
+
+        for obj in self.scene.objects:
+            if issubclass(type(obj), Light):
+                self.lights.append(obj)
 
     def increase_scene_speed(self):
         if self.scene.speed < self.SCENE_MAX_SPEED:
@@ -201,10 +211,10 @@ class Phototaxis:
 
     def parse_cli_arguments(self):
         parser = util.cli_parser.CliParser()
-        parser.parse_args(self.DEFAULT_SCENE_PATH, self.DEFAULT_SCENE_SPEED, SceneType.PHOTOTAXIS)
+        parser.parse_args(self.DEFAULT_SCENE_FILE, self.DEFAULT_SCENE_SPEED, SceneType.PHOTOTAXIS)
 
         self.scene_speed = parser.scene_speed
-        self.scene_path = parser.scene_path
+        self.scene_file = parser.scene_file
 
 
 if __name__ == '__main__':

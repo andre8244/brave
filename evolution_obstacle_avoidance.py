@@ -113,7 +113,7 @@ class EvolutionObstacleAvoidance:
         self.mutation_coefficient = parser.mutation_coefficient
         self.robot_random_direction = parser.robot_random_direction
         self.scene_speed = parser.scene_speed
-        self.scene_path = parser.scene_path
+        self.scene_path = parser.scene_file
         self.obstacle_sensor_error = parser.obstacle_sensor_error
         self.selection_ratio = parser.selection_ratio
         self.multicore = parser.multicore

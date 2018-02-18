@@ -1,0 +1,5 @@
+Scene 700 700
+Light 175 175 20
+Light 525 175 20
+Light 175 525 20
+Light 525 525 20

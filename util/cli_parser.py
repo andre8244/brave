@@ -17,11 +17,12 @@ class CliParser:
         self.selection_ratio = None
         self.multicore = None
         self.verbose = None
-        self.scene_path = None
+        self.scene_file = None
         self.scene_speed = None
-        self.genomes_path = None
+        self.genome_file = None
+        self.load_all_genomes = None
 
-    def parse_args(self, default_scene_path, default_scene_speed, scene_type):
+    def parse_args(self, default_scene_file, default_scene_speed, scene_type):
         parser = argparse.ArgumentParser()
 
         if scene_type == SceneType.GA_OBSTACLE_AVOIDANCE:
@@ -47,18 +48,21 @@ class CliParser:
                                     GaEngine.DEFAULT_SELECTION_RATIO), type=float, metavar='NUM')
 
             parser.add_argument('-r', '--random_direction', help='Set an initial random direction for the vehicles',
-                                action="store_true")
+                                action='store_true')
 
             parser.add_argument('-E', '--sensor_error',
                                 help='Coefficient used to simulate the obstacle sensor read error. Default: ' + str(
                                     GaEngine.DEFAULT_OBSTACLE_SENSOR_ERROR) + ', recommended: < 0.2', type=float, metavar='NUM')
 
-            parser.add_argument('-c', '--multicore', help='Enable multicore support (experimental)', action="store_true")
+            parser.add_argument('-c', '--multicore', help='Enable multicore support (experimental)', action='store_true')
 
         if scene_type == SceneType.OBSTACLE_AVOIDANCE:
             parser.add_argument('-g', '--genomes', help='Path of the genome file. Default: none', metavar='FILE')
 
-        parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + default_scene_path,
+            parser.add_argument('-a', '--load_all_genomes', help='Load all the genomes contained in a genome file. ' +
+                                'Applicable with --genomes parameter only', action='store_true')
+
+        parser.add_argument('-s', '--scene', help='Path of the scene file. Default: ' + default_scene_file,
                             metavar='FILE')
 
         parser.add_argument('-f', '--fps',
@@ -79,9 +83,10 @@ class CliParser:
             self.verbose = EvolutionObstacleAvoidance.DEFAULT_VERBOSE_VALUE if args.verbose is None else args.verbose
 
         if scene_type == SceneType.OBSTACLE_AVOIDANCE:
-            self.genomes_path = args.genomes
+            self.genome_file = args.genomes
+            self.load_all_genomes = args.load_all_genomes
 
-        self.scene_path = default_scene_path if args.scene is None else args.scene
+        self.scene_file = default_scene_file if args.scene is None else args.scene
         self.scene_speed = default_scene_speed if args.fps is None else args.fps
 
         # check parameters value

@@ -53,6 +53,16 @@ class Scene:
             for line in f:
                 words = line.split()
 
+                # skip empty lines
+                if len(words) == 0:
+                    line_number += 1
+                    continue
+
+                # skip comments in file
+                if words[0][0] == '#':
+                    line_number += 1
+                    continue
+
                 if words[0] == 'Scene':
                     width = int(words[1])
                     height = int(words[2])

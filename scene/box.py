@@ -26,8 +26,8 @@ class Box(Obstacle):
         return self.__class__.__name__ + ' ' + str(self.x) + ' ' + str(self.y) + ' ' + str(self.size)
 
     def draw_label(self, screen):
-        if pygame.font:
+        if pygame.font and self.label is not None:
             font = pygame.font.Font(None, 24)
             text = font.render(str(self.label), 1, Color.YELLOW, Color.DARK_GRAY)
-            text_pos = pygame.Rect(self.x + (self.size / 2), self.y + (self.size / 2), 50, 50)
+            text_pos = pygame.Rect(self.x, self.y, 50, 50)
             screen.blit(text, text_pos)
