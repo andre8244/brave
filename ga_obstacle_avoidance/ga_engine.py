@@ -336,6 +336,7 @@ class GaEngine:
             f.write(line1 + '\n')
             f.write(line2 + '\n')
             f.write(line3 + '\n')
+            f.write('\n')
 
             for genome in genomes_to_save:
                 line = genome.get_saved_genome_repr()

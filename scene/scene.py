@@ -33,7 +33,22 @@ class Scene:
         file_path = 'saved_scenes/' + file_name
 
         with open(file_path, 'w') as f:
-            f.write(self.get_saved_scene_repr() + '\n')  # first line with scene size
+            line1 = '# First uncommented line must starts with "Scene"'
+            line2 = '# This is the syntax for each kind of object:'
+            line3 = '# Scene WIDTH HEIGHT'
+            line4 = '# Wall X1 Y1 X2 Y2'
+            line5 = '# Box X Y SIZE'
+            line6 = '# Light X Y EMITTING_POWER'
+
+            f.write(line1 + '\n')
+            f.write(line2 + '\n')
+            f.write(line3 + '\n')
+            f.write(line4 + '\n')
+            f.write(line5 + '\n')
+            f.write(line6 + '\n')
+            f.write('\n')
+
+            f.write(self.get_saved_scene_repr() + '\n')  # scene size
 
             for obj in self.objects:
                 if hasattr(obj, 'get_saved_scene_repr'):

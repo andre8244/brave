@@ -1,3 +1,10 @@
+# First uncommented line must starts with "Scene"
+# This is the syntax for each kind of object:
+# Scene WIDTH HEIGHT
+# Wall X1 Y1 X2 Y2
+# Box X Y SIZE
+# Light X Y EMITTING_POWER
+
 Scene 700 700
 Wall 5 5 695 5
 Wall 695 5 695 695
