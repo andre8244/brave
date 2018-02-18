@@ -40,7 +40,7 @@ class ObstacleAvoidance:
     SCREEN_MARGIN = int(ROBOT_SIZE / 2)
     SIDE_PANEL_WIDTH = 400
 
-    BOX_SIZE = 60
+    BOX_SIZE = 40
     BOX_SIZE_MIN = 20
     BOX_SIZE_INTERVAL = 60
 
