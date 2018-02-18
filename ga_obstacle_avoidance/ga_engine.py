@@ -23,7 +23,7 @@ class GaEngine:
     DEFAULT_MUTATION_COEFFICIENT = 0.07
     DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
     LONG_LASTING_GENERATION_STEP_NUM = 3000
-    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00001  # increasing probability to add a new obstacle in the scene.
+    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00002  # increasing probability to add a new obstacle in the scene.
     BOX_MIN_SIZE = 20
     BOX_MAX_SIZE = 60
 
@@ -137,6 +137,7 @@ class GaEngine:
                 box = self.create_box()
                 self.scene.put(box)
                 self.obstascles_added.append(box)
+                self.printd(1, 'Long lasting generation: created a new obstacle')
 
         # check population extinction
         if not self.robots:
