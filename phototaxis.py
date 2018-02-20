@@ -32,7 +32,7 @@ class Phototaxis:
 
     DEFAULT_SCENE_FILE = 'saved_scenes/four_lights_700.txt'
     DEFAULT_SCENE_SPEED = 30
-    SCENE_MAX_SPEED = 200
+    SCENE_MAX_SPEED = 1000
     SCENE_MIN_SPEED = 1
     SCENE_SPEED_CHANGE_COEFF = 1.5
     SAVED_SCENE_FILENAME = 'phototaxis_scene'

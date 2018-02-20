@@ -27,12 +27,12 @@ class ObstacleAvoidance:
     MOTOR_CONTROLLER_MIN_ACTUATOR_VALUE = 10
     SENSOR_DELTA_DIRECTION = 0.44
     SENSOR_SATURATION_VALUE = 85
-    SENSOR_MAX_DISTANCE = 140
-    SENSOR_ERROR = 0.1
+    SENSOR_MAX_DISTANCE = 120
+    SENSOR_ERROR = 0.2
 
-    DEFAULT_SCENE_FILE = 'saved_scenes/four_boxes_and_walls_700.txt'
+    DEFAULT_SCENE_FILE = 'saved_scenes/some_boxes_700.txt'
     DEFAULT_SCENE_SPEED = 30
-    SCENE_MAX_SPEED = 200
+    SCENE_MAX_SPEED = 1000
     SCENE_MIN_SPEED = 1
     SCENE_SPEED_CHANGE_COEFF = 1.5
     SAVED_SCENE_FILENAME = 'obstacle_avoidance_scene'
