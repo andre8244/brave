@@ -6,6 +6,7 @@
 # Light X Y EMITTING_POWER
 
 Scene 700 700
+
 Light 175 175 20
 Light 525 175 20
 Light 175 525 20
