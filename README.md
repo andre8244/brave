@@ -70,3 +70,7 @@ The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_
 TODO kazam capture
 
 TODO link to youtube video
+
+## License
+
+[GNU GPLv3](LICENSE)
