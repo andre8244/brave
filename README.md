@@ -42,12 +42,12 @@ An obstacle avoidance simulator is provided in `obstacle_avoidance.py`. The Pyth
 
 High-quality obstacle avoidance can be generated executing a [genetic algorithm](https://en.wikipedia.org/wiki/Genetic_algorithm). The parameters that involve obstacle avoidance behavior are:
 
-* vehicle wheel radius: affects vehicle speed
-* motor controller coefficient: affects how much a detected obstacle makes the vehicle steer
-* motor controller minimum actuator value: affects the speed of the vehicle when no obstacles are detected
-* sensor delta direction: relative angle (in radians) between sensor and vehicle bearing
-* sensor saturation value
-* sensor maximum distance
+* **vehicle wheel radius**: affects vehicle speed
+* **motor controller coefficient**: affects how much a detected obstacle makes the vehicle steer
+* **motor controller minimum actuator value**: affects the speed of the vehicle when no obstacles are detected
+* **sensor delta direction**: relative angle (in radians) between sensor and vehicle bearing
+* **sensor saturation value**
+* **sensor maximum distance**
 
 The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)) at every iteration.
 
