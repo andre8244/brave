@@ -23,7 +23,7 @@ class GaEngine:
     DEFAULT_MUTATION_COEFFICIENT = 0.07
     DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
     LONG_LASTING_GENERATION_STEP_NUM = 2500
-    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.00004  # increasing probability to add a new obstacle in the scene.
+    LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.0005  # increasing probability to add a new obstacle in the scene.
     BOX_MIN_SIZE = 20
     BOX_MAX_SIZE = 60
 
