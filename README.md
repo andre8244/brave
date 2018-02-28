@@ -4,8 +4,6 @@ BRAVE (BRAitenberg Vehicles Evolution) is a [genetic algorithm](https://en.wikip
 
 TODO screenshot
 
-TODO LICENSE
-
 ## Requirements
 
 * Python 3.5+
@@ -25,15 +23,15 @@ The behavior of an agent is influenced by various parameters, such as the size o
 ## Phototaxis
 
 A phototaxis simulator is provided in `phototaxis.py`. The Python script accepts the following command line arguments:
-* `-h`, `--help`   show a help message similar to this
+* `-h`, `--help`   show a help message
 * `-s FILE`, `--scene FILE`   path to a scene file; a custom scene for the phototaxis simulator can be specified
 * `-f NUM`, `--fps NUM`   frame rate of the simulation
 
 ## Obstacle avoidance simulator
 
 An obstacle avoidance simulator is provided in `obstacle_avoidance.py`. The Python script accepts the following command line arguments:
-* `-h`, `--help`   show a help message similar to this
-* `-g FILE`, `--genomes FILE`   load obstacle avoidance vehicles from file. Every line of the file represents a *genome*, that is the set of obstacle avoidance parameters used by a vehicle. By default, only the first 10 genomes of the file are loaded
+* `-h`, `--help`   show a help message
+* `-g FILE`, `--genomes FILE`   load obstacle avoidance vehicles from file. Every line in the file represents a *genome*, that is the set of obstacle avoidance parameters used by a vehicle. By default, only the first 10 genomes of the file are loaded
 * `-a`, `--load_all_genomes`   load all the genomes contained in a genome file, instead of the first 10. Applicable with `--genomes` parameter only
 * `-s FILE`, `--scene FILE`   path of the scene file; a custom scene for the obstacle avoidance simulator can be specified
 * `-f NUM`, `--fps NUM`   frame rate of the simulation
@@ -49,11 +47,11 @@ High-quality obstacle avoidance can be generated executing a [genetic algorithm]
 * **sensor saturation value**
 * **sensor maximum distance**
 
-The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)) at every iteration.
+The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)).
 
 The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_avoidance.py`. The Python script accepts the following command line arguments:
 
-* `-h`, `--help`   show a help message similar to this
+* `-h`, `--help`   show a help message
 * `-v {0,1,2}`, `--verbose {0,1,2}`   set script verbosity
 * `-p NUM`, `--population NUM`   number of vehicles in each generation
 * `-e NUM`, `--elite NUM`   number of vehicles carried over unaltered to a new generation (elitism)
