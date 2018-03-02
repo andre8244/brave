@@ -22,7 +22,7 @@ class GaEngine:
     DEFAULT_MUTATION_PROBABILITY = 0.3  # 0 < MUTATION_PROBABILITY < 1
     DEFAULT_MUTATION_COEFFICIENT = 0.07
     DEFAULT_SELECTION_RATIO = 0.3  # 0 < DEFAULT_SELECTION_RATIO < 1
-    LONG_LASTING_GENERATION_STEP_NUM = 2500
+    LONG_LASTING_GENERATION_STEP_NUM = 3000
     LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA = 0.0005  # increasing probability to add a new obstacle in the scene.
     BOX_MIN_SIZE = 20
     BOX_MAX_SIZE = 60
@@ -108,7 +108,7 @@ class GaEngine:
                 partial_duration = end_time - start_time
                 print('Step partial duration', partial_duration)
 
-            for robot in self.robots:
+            for robot in self.robots[:]:
                 # ensure robot doesn't accidentaly go outside of the scene
                 if robot.x < 0 or robot.x > self.scene.width or robot.y < 0 or robot.y > self.scene.height:
                     self.destroy_robot(robot)
@@ -118,7 +118,7 @@ class GaEngine:
                     self.destroy_robot(robot)
         else:
             # multicore = False
-            for robot in self.robots:
+            for robot in self.robots[:]:
                 robot.sense_and_act()
 
                 # ensure robot doesn't accidentaly go outside of the scene
@@ -130,14 +130,12 @@ class GaEngine:
                     self.destroy_robot(robot)
 
         # create new obstacles for long lasting generations
-        if not self.long_lasting_generations and self.generation_step_num > self.LONG_LASTING_GENERATION_STEP_NUM:
-            self.new_obstacle_probability += self.LONG_LASTING_GENERATION_OBSTACLE_PROB_DELTA
+        if not self.long_lasting_generations and self.generation_step_num == self.LONG_LASTING_GENERATION_STEP_NUM:
+            print('Time limit reached (' + str(self.LONG_LASTING_GENERATION_STEP_NUM) +
+                  ' steps), destroying all remaining robots')
 
-            if random.random() < self.new_obstacle_probability:
-                box = self.create_box()
-                self.scene.put(box)
-                self.obstascles_added.append(box)
-                self.printd(1, 'Long lasting generation: created a new obstacle')
+            for robot in self.robots[:]:
+                self.destroy_robot(robot)
 
         # check population extinction
         if not self.robots:
