@@ -60,7 +60,7 @@ The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_
 * `-S NUM`, `--selection_ratio NUM`   ratio of parents selected to breed a new generation
 * `-r`, `--random_direction`   set an initial random direction for the vehicles. If enabled, the fitness value of elite genomes will change in subsequent generations
 * `-E NUM`, `--sensor_error NUM`   coefficient used to simulate the obstacle sensor read error. If non-zero, the fitness value of elite genomes will change in subsequent generations
-* `-l`, `--long_lasting_generations`   enable long lasting generations. By default, if a generation lasts more than a certain amount of time, new random obstacles are added to the scene until every vehicle hit one of them. If the parameter is enabled, this behavior is inhibited
+* `-l`, `--long_lasting_generations`   enable long lasting generations. By default, generations have a time limit: if reached, all remaining robots are destroyed and a new generation is created. If this parameter is enabled, generations don't have a time limit
 * `-c`, `--multicore`   enable multicore support (experimental)
 * `-s FILE`, `--scene FILE`   path of the scene file; a custom scene for the genetic algorithm can be specified
 * `-f NUM`, `--fps NUM`   frame rate of the genetic algorithm execution
