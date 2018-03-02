@@ -47,7 +47,7 @@ High-quality obstacle avoidance can be generated executing a [genetic algorithm]
 * **sensor saturation value**
 * **sensor maximum distance**
 
-The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)).
+The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)). The [fitness](https://en.wikipedia.org/wiki/Fitness_function) of every genome is evalued considering the distance travelled by the related vehicle before colliding with an obstacle.
 
 The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_avoidance.py`. The Python script accepts the following command line arguments:
 
