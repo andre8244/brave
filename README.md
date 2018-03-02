@@ -2,7 +2,9 @@
 
 BRAVE (BRAitenberg Vehicles Evolution) is a [genetic algorithm](https://en.wikipedia.org/wiki/Genetic_algorithm) engine and a simulator for [Braitenberg vehicles](https://en.wikipedia.org/wiki/Braitenberg_vehicle) written in Python.
 
-TODO screenshot
+A demo of the genetic algorithm execution is avalable on [YouTube](https://youtu.be/MXiJbRZ7j-c).
+
+![BRAVE screenshot](brave.png)
 
 ## Requirements
 
@@ -47,7 +49,7 @@ High-quality obstacle avoidance can be generated executing a [genetic algorithm]
 * **sensor saturation value**
 * **sensor maximum distance**
 
-The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)). The [fitness](https://en.wikipedia.org/wiki/Fitness_function) of every genome is evaluated considering the distance travelled by the related vehicle before colliding with an obstacle.
+The set of these parameters compose a *genome*, the genetic representation of a candidate solution. During the execution of the genetic algorithm, a population of genomes is evolved toward better solutions, applying [crossover](https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)) and [mutation](https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)). The [fitness](https://en.wikipedia.org/wiki/Fitness_function) of every genome is evaluated considering the distance traveled by the related vehicle before colliding with an obstacle.
 
 The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_avoidance.py`. The Python script accepts the following command line arguments:
 
@@ -65,9 +67,7 @@ The genetic algorithm for obstacle avoidance is provided in `evolution_obstacle_
 * `-s FILE`, `--scene FILE`   path of the scene file; a custom scene for the genetic algorithm can be specified
 * `-f NUM`, `--fps NUM`   frame rate of the genetic algorithm execution
 
-TODO kazam capture
-
-TODO link to youtube video
+A demo of the genetic algorithm execution is avalable on [YouTube](https://youtu.be/MXiJbRZ7j-c).
 
 ## License
 
