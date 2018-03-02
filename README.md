@@ -8,7 +8,7 @@ A demo of the genetic algorithm execution is avalable on [YouTube](https://youtu
 
 ## Requirements
 
-* Python 3.5+
+* [Python](https://www.python.org/) 3.5+
 * [Pygame](https://www.pygame.org/news) 1.9.3+
 
 ## The vehicles
